@@ -1,9 +1,8 @@
 from rest_framework import generics, permissions
+from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.authtoken.models import Token
-from rest_framework.authentication import TokenAuthentication
-from django.contrib.auth import authenticate 
+from rest_framework_simplejwt.tokens import RefreshToken
 from accounts.models import Account
 from accounts.serializers import AccountSerializer
 
@@ -20,3 +19,22 @@ class ListAccounts(generics.ListAPIView):
     queryset = Account.objects.all()
     serializer_class = AccountSerializer
     permission_class = [permissions.AllowAny]
+
+class HomeView(APIView):
+    permission_classes = (permissions.IsAuthenticated, )
+
+    def get(self, request):
+        content = {'message': 'Welcome to the JWT Authentication page usignREact Js and Django!'}
+        return Response(content)
+
+class LogoutView(APIView):
+    permission_classes = (permissions.IsAuthenticated, )
+    #Invalid refresh token, so after access token expires user has to log in again
+    def post(self, request):
+        try:
+            refresh_token = request.data["refresh_token"]
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            return Response(status=status.HTTP_205_RESET_CONTENT)
+        except Exception as e:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
