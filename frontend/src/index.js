@@ -1,5 +1,6 @@
 import App from "./App";
 import ReactDOM from 'react-dom/client'
+import './interceptors/axios';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 

@@ -13,28 +13,21 @@ export const Login = () => {
       password: password,
     };
 
-    const { data } = await axios
-      .post("http://127.0.0.1:8000/api/account/login/", account, {
+    const { data } = await axios.post(
+      "http://127.0.0.1:8000/api/account/login",
+      account,
+      {
         headers: { "Content-Type": "application/json" },
         withCredentials: true,
-      })
-      .then((response) => {
-        //Find reason of the error after loging
-        //Right now tokens successfully are fetched from backend but error is thrown
-        // console.log("Full Response:", response);
-        
-        console.log("Full data:", data);
-        localStorage.clear();
-        localStorage.setItem("access_token", data.access);
-        localStorage.setItem("refresh_token", data.refresh);
-        axios.defaults.headers.common[
-          "Authorization"
-        ] = `Bearer ${data["access"]}`;
-        window.location.href = "/";
-      })
-      .catch((error) => {
-        console.error("Error during login:", error);
-      });
+      }
+    );
+
+    localStorage.clear();
+    localStorage.setItem("access_token", data.access);
+    localStorage.setItem("refresh_token", data.refresh);
+    axios.defaults.headers.common["Authorization"] = `Bearer ${data.access}`;
+    window.location.href = "/";
+
   };
   return (
     <div className="Auth-form-container">

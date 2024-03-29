@@ -18,18 +18,17 @@ class AccountDetail(generics.RetrieveUpdateDestroyAPIView):
 class ListAccounts(generics.ListAPIView):
     queryset = Account.objects.all()
     serializer_class = AccountSerializer
-    permission_class = [permissions.AllowAny]
+    permission_class = [permissions.IsAuthenticated]
 
 class HomeView(APIView):
     permission_classes = (permissions.IsAuthenticated, )
 
     def get(self, request):
-        content = {'message': 'Welcome to the JWT Authentication page usignREact Js and Django!'}
+        content = {'message': 'Home view response. You are authenticated!'}
         return Response(content)
 
 class LogoutView(APIView):
     permission_classes = (permissions.IsAuthenticated, )
-    #Invalid refresh token, so after access token expires user has to log in again
     def post(self, request):
         try:
             refresh_token = request.data["refresh_token"]
@@ -37,4 +36,4 @@ class LogoutView(APIView):
             token.blacklist()
             return Response(status=status.HTTP_205_RESET_CONTENT)
         except Exception as e:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=e)
