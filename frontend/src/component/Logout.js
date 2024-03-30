@@ -6,13 +6,13 @@ export const Logout = () => {
         (async () => {
             try {
                 const { data } = await axios.post(
-                    "http://127.0.0.1:8000/api/account/logout",
+                    "http://127.0.0.1:8000/auth/account/logout",
                     {
                         refresh_token:localStorage.getItem('refresh_token')
                     },
                     {
                       headers: { "Content-Type": "application/json" },
-                      withCredentials: true,
+                      withCredentials: true
                     }
                   );
                   localStorage.clear();

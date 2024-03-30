@@ -5,10 +5,11 @@ let refresh = false;
 axios.interceptors.response.use(
   (resp) => resp,
   async (error) => {
+    console.log(error);
     if (error.response.status === 401 && !refresh) {
       refresh = true;
       const token = await axios.post(
-        "http://127.0.0.1/api/account/login/refresh",
+        "http://127.0.0.1/auth/account/login/refresh",
         {
           refresh:localStorage.getItem("refresh_token"),
         },

@@ -10,7 +10,7 @@ export const Home = () => {
     } else {
       (async () => {
         try {
-          const { data } = await axios.get("http://127.0.0.1:8000/api/home", {
+          const { data } = await axios.get("http://127.0.0.1:8000/auth/home", {
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${localStorage.getItem("access_token")}`,

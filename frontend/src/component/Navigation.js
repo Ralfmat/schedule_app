@@ -9,7 +9,7 @@ export function Navigation() {
     if (localStorage.getItem("access_token") !== null) {
       (async () => {
         try {
-          await axios.get("http://127.0.0.1:8000/api/home", {
+          await axios.get("http://127.0.0.1:8000/auth/home", {
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${localStorage.getItem("access_token")}`,
