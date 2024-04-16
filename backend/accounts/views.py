@@ -1,24 +1,36 @@
-from rest_framework import generics, permissions
+from rest_framework import permissions
 from rest_framework import status
+from rest_framework.generics import RetrieveUpdateDestroyAPIView, CreateAPIView, ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from accounts.models import Account
-from accounts.serializers import AccountSerializer
+from accounts.serializers import *
 
-class AccountRegistration(generics.CreateAPIView):
+class AccountRegistration(CreateAPIView):
     serializer_class = AccountSerializer
-    permission_class = [permissions.AllowAny]
+    permission_class = (permissions.AllowAny, )
 
-class AccountDetail(generics.RetrieveUpdateDestroyAPIView):
+
+class AccountDetail(RetrieveUpdateDestroyAPIView):
     queryset = Account.objects.all()
-    serializer_class = AccountSerializer
-    permission_class = [permissions.IsAuthenticated]
+    serializer_class = AccountDetailSerializer
+    permission_class = (permissions.IsAuthenticated, )
 
-class ListAccounts(generics.ListAPIView):
+
+class GetCurrentUserId(APIView):
+    permission_classes = (permissions.IsAuthenticated, )
+
+    def get(self, request):
+        user = request.user
+        return Response({'id': user.id})
+
+
+class ListAccounts(ListAPIView):
     queryset = Account.objects.all()
-    serializer_class = AccountSerializer
-    permission_class = [permissions.IsAuthenticated]
+    serializer_class = AccountDetailSerializer
+    permission_class = (permissions.IsAuthenticated, )
+
 
 class HomeView(APIView):
     permission_classes = (permissions.IsAuthenticated, )
@@ -27,8 +39,9 @@ class HomeView(APIView):
         content = {'message': 'Home view response. You are authenticated!'}
         return Response(content)
 
+
 class LogoutView(APIView):
-    permission_classes = (permissions.IsAuthenticated, )
+    permission_classes = (permissions.AllowAny, )
     def post(self, request):
         try:
             refresh_token = request.data["refresh_token"]

@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Account
 
+
 class AccountSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
 
@@ -17,3 +18,9 @@ class AccountSerializer(serializers.ModelSerializer):
         user.set_password(validated_data['password'])
         user.save()
         return user
+
+
+class AccountDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Account
+        fields = ('id', 'username', 'email', 'first_name', 'last_name', 'phone_number')
