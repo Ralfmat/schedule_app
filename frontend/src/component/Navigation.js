@@ -18,11 +18,16 @@ export function Navigation() {
           setIsAuth(true);
         } catch (e) {
           setIsAuth(false);
+          if (e.response.status === 401) {
+            window.location.href = "/login";
+          } else {
+            console.log(e);
+          }
         }
       })();
     }
   }, [isAuth]);
-  
+   
   return (
     <div>
       <Navbar bg="dark" variant="dark">

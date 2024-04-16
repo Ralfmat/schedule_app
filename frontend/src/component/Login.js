@@ -1,9 +1,12 @@
 import axios from "axios";
 import { useState } from "react";
+import { authInterceptor, refreshTokenInterceptor } from "../interceptors/axios";
 
 export const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  axios.interceptors.request.eject(authInterceptor);
+  // axios.interceptors.request.eject(refreshTokenInterceptor);
 
   const submit = async (e) => {
     e.preventDefault();
@@ -25,9 +28,7 @@ export const Login = () => {
     localStorage.clear();
     localStorage.setItem("access_token", data.access);
     localStorage.setItem("refresh_token", data.refresh);
-    axios.defaults.headers.common["Authorization"] = `Bearer ${data.access}`;
     window.location.href = "/";
-
   };
   return (
     <div className="Auth-form-container">
