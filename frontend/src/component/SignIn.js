@@ -2,9 +2,11 @@ import axios from "axios";
 import { useState } from "react";
 import { authInterceptor, refreshTokenInterceptor } from "../interceptors/axios";
 
-export const Login = () => {
+export const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
   axios.interceptors.request.eject(authInterceptor);
   // axios.interceptors.request.eject(refreshTokenInterceptor);
 
@@ -30,6 +32,11 @@ export const Login = () => {
     localStorage.setItem("refresh_token", data.refresh);
     window.location.href = "/";
   };
+  
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  }
+
   return (
     <div className="Auth-form-container">
       <form className="Auth-form" onSubmit={submit}>
@@ -51,13 +58,19 @@ export const Login = () => {
             <label>Password</label>
             <input
               name="password"
-              type="password"
+              type={showPassword ? "text" : "password"}
               className="form-control mt-1"
               placeholder="Enter password"
               value={password}
               required
               onChange={(e) => setPassword(e.target.value)}
             />
+            <button
+            type="button"
+            className="btn btn-outline-secondary mt-1"
+            onClick={togglePasswordVisibility}>
+               {showPassword ? "Hide" : "Show"}
+            </button>
           </div>
           <div className="d-grid gap-2 mt-3">
             <button type="submit" className="btn btn-primary">

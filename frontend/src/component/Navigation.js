@@ -2,6 +2,7 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+
 export function Navigation() {
   const [isAuth, setIsAuth] = useState(false);
 
@@ -19,7 +20,7 @@ export function Navigation() {
         } catch (e) {
           setIsAuth(false);
           if (e.response.status === 401) {
-            window.location.href = "/login";
+            window.location.href = "/sign-in";
           } else {
             console.log(e);
           }
@@ -27,11 +28,11 @@ export function Navigation() {
       })();
     }
   }, [isAuth]);
-   
+
   return (
     <div>
       <Navbar bg="dark" variant="dark">
-        <Navbar.Brand href="/">JWT Authentification</Navbar.Brand>
+        <Navbar.Brand href="/">JWT Authentication</Navbar.Brand>
         <Nav className="me-auto">
           {isAuth ? <Nav.Link href="/">Home</Nav.Link> : null}
         </Nav>
@@ -39,7 +40,10 @@ export function Navigation() {
           {isAuth ? (
             <Nav.Link href="/logout">Logout</Nav.Link>
           ) : (
-            <Nav.Link href="/login">Login</Nav.Link>
+            <>
+              <Nav.Link href="/sign-in">Sign In</Nav.Link>
+              <Nav.Link href="/sign-up">Sign Up</Nav.Link>
+            </>
           )}
         </Nav>
       </Navbar>

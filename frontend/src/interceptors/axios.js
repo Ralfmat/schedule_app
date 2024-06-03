@@ -41,7 +41,7 @@ export const authInterceptor  = axios.interceptors.request.use(
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     } else {
-      window.location.href = "/login";
+      window.location.href = "/sign-in";
     }
     return config;
   },
