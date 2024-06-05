@@ -10,6 +10,7 @@ export const SignUp = () => {
   const [lastName, setLastName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
 
   axios.interceptors.request.eject(authInterceptor);
@@ -17,7 +18,7 @@ export const SignUp = () => {
   const submit = async (e) => {
     e.preventDefault();
 
-    const newUser = {
+    const newAccount = {
       username: username,
       email: email,
       first_name: firstName,
@@ -34,31 +35,42 @@ export const SignUp = () => {
     try {
       const { data } = await axios.post(
         "http://127.0.0.1:8000/auth/account/register",
-        newUser,
+        newAccount,
         {
           headers: { "Content-Type": "application/json" },
           withCredentials: true,
         }
       );
+      setErrors({});
+      try {
+        const { data } = await axios.post(
+          "http://127.0.0.1:8000/auth/account/login",
+          account,
+          {
+            headers: { "Content-Type": "application/json" },
+            withCredentials: true,
+          }
+        );
+        localStorage.clear();
+        localStorage.setItem("access_token", data.access);
+        localStorage.setItem("refresh_token", data.refresh);
+        window.location.href = "/";
+      } catch (error) {
+        console.error("Error with logging after successful registration", error);
+      }
     } catch (error) {
       console.error("Registration error", error);
-    }
+      if (error.response && error.response.data) {
+        const capitalizeFirstLetter = (str) => str.charAt(0).toUpperCase() + str.slice(1);
 
-    try {
-      const { data } = await axios.post(
-        "http://127.0.0.1:8000/auth/account/login",
-        account,
-        {
-          headers: { "Content-Type": "application/json" },
-          withCredentials: true,
-        }
-      );
-      localStorage.clear();
-      localStorage.setItem("access_token", data.access);
-      localStorage.setItem("refresh_token", data.refresh);
-      window.location.href = "/";
-    } catch (error) {
-      console.error("Error with logging after successful registration", error);
+        let capitalizedErrors = Object.fromEntries(
+            Object.entries(error.response.data).map(([key, messages]) => [
+                key,
+                messages.map(capitalizeFirstLetter)
+            ])
+        );
+        setErrors(capitalizedErrors);
+      }
     }
   };
 
@@ -82,6 +94,9 @@ export const SignUp = () => {
               required
               onChange={(e) => setUsername(e.target.value)}
             />
+            {errors.username && errors.username.map((error, index) => (
+              <p key={index} className="error">{error}</p>
+            ))}
           </div>
           <div className="form-group mt-3">
             <label>Email</label>
@@ -94,6 +109,9 @@ export const SignUp = () => {
               required
               onChange={(e) => setEmail(e.target.value)}
             />
+            {errors.email && errors.email.map((error, index) => (
+              <p key={index} className="error">{error}</p>
+            ))}
           </div>
           <div className="form-group mt-3">
             <label>First Name</label>
@@ -106,6 +124,9 @@ export const SignUp = () => {
               required
               onChange={(e) => setFirstName(e.target.value)}
             />
+            {errors.first_name && errors.first_name.map((error, index) => (
+              <p key={index} className="error">{error}</p>
+            ))}
           </div>
           <div className="form-group mt-3">
             <label>Last Name</label>
@@ -118,6 +139,9 @@ export const SignUp = () => {
               required
               onChange={(e) => setLastName(e.target.value)}
             />
+            {errors.last_name && errors.last_name.map((error, index) => (
+              <p key={index} className="error">{error}</p>
+            ))}
           </div>
           <div className="form-group mt-3">
             <label>Phone Number</label>
@@ -130,6 +154,9 @@ export const SignUp = () => {
               required
               onChange={(e) => setPhoneNumber(e.target.value)}
             />
+            {errors.phone_number && errors.phone_number.map((error, index) => (
+              <p key={index} className="error">{error}</p>
+            ))}
           </div>
           <div className="form-group mt-3">
             <label>Password</label>
@@ -142,6 +169,9 @@ export const SignUp = () => {
               required
               onChange={(e) => setPassword(e.target.value)}
             />
+            {errors.password && errors.password.map((error, index) => (
+              <p key={index} className="error">{error}</p>
+            ))}
             <button
               type="button"
               className="btn btn-outline-secondary mt-1"

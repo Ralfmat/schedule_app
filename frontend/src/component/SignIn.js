@@ -1,14 +1,17 @@
 import axios from "axios";
 import { useState } from "react";
-import { authInterceptor, refreshTokenInterceptor } from "../interceptors/axios";
+import {
+  authInterceptor,
+  refreshTokenInterceptor,
+} from "../interceptors/axios";
 
 export const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
 
   axios.interceptors.request.eject(authInterceptor);
-  // axios.interceptors.request.eject(refreshTokenInterceptor);
 
   const submit = async (e) => {
     e.preventDefault();
@@ -18,24 +21,40 @@ export const SignIn = () => {
       password: password,
     };
 
-    const { data } = await axios.post(
-      "http://127.0.0.1:8000/auth/account/login",
-      account,
-      {
-        headers: { "Content-Type": "application/json" },
-        withCredentials: true,
+    try {
+      const { data } = await axios.post(
+        "http://127.0.0.1:8000/auth/account/login",
+        account,
+        {
+          headers: { "Content-Type": "application/json" },
+          withCredentials: true,
+        }
+      );
+      localStorage.clear();
+      localStorage.setItem("access_token", data.access);
+      localStorage.setItem("refresh_token", data.refresh);
+      window.location.href = "/";
+    } catch (error) {
+      console.error("Logging error", error);
+      if (error.response && error.response.data) {
+        setErrors(error.response.data);
       }
-    );
-
-    localStorage.clear();
-    localStorage.setItem("access_token", data.access);
-    localStorage.setItem("refresh_token", data.refresh);
-    window.location.href = "/";
+    }
   };
-  
+
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
-  }
+  };
+
+  const handleInputChange = (e) => {
+    // Reset errors whenever there's a change in input
+    setErrors({});
+    if (e.target.name === "email") {
+      setEmail(e.target.value);
+    } else if (e.target.name === "password") {
+      setPassword(e.target.value);
+    }
+  };
 
   return (
     <div className="Auth-form-container">
@@ -51,7 +70,7 @@ export const SignIn = () => {
               type="email"
               value={email}
               required
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={handleInputChange}
             />
           </div>
           <div className="form-group mt-3">
@@ -63,15 +82,17 @@ export const SignIn = () => {
               placeholder="Enter password"
               value={password}
               required
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={handleInputChange}
             />
             <button
-            type="button"
-            className="btn btn-outline-secondary mt-1"
-            onClick={togglePasswordVisibility}>
-               {showPassword ? "Hide" : "Show"}
+              type="button"
+              className="btn btn-outline-secondary mt-1"
+              onClick={togglePasswordVisibility}
+            >
+              {showPassword ? "Hide" : "Show"}
             </button>
           </div>
+          {errors.detail && <p className="error">{errors.detail}</p>}
           <div className="d-grid gap-2 mt-3">
             <button type="submit" className="btn btn-primary">
               Submit
