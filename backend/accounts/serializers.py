@@ -11,16 +11,8 @@ class AccountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Account
-        fields = ('id', 'username', 'email', 'first_name', 'last_name', 'phone_number', 'password')
+        fields = ('username', 'email', 'first_name', 'last_name', 'phone_number', 'password')
 
-    def validate_email(self, value):
-        """
-        Check if the provided email is unique.
-        """
-        if User.objects.filter(email=value).exists():
-            raise ValidationError("Email is already in use.")
-        return value
-    
     def create(self, validated_data):
         user = Account.objects.create(
             username=validated_data['username'],
