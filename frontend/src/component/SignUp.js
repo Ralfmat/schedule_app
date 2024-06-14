@@ -2,8 +2,11 @@ import axios from "axios";
 import { useState } from "react";
 import "./styles.css";
 import { authInterceptor } from "../interceptors/axios";
+import { redirectIfLoggedIn } from "../utils/authUtils";
 
 export const SignUp = () => {
+  redirectIfLoggedIn();
+  
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState("");

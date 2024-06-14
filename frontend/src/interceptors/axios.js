@@ -1,7 +1,7 @@
 import axios from "axios";
 
 let refresh = false;
-// TODO: confiugre response interceptor so it is clear and working
+// TODO: confiugre response interceptor so it is working
 //       it should refresh access token 
 
 // export const refreshTokenInterceptor = axios.interceptors.response.use(

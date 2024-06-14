@@ -1,11 +1,11 @@
 import axios from "axios";
 import { useState } from "react";
-import {
-  authInterceptor,
-  refreshTokenInterceptor,
-} from "../interceptors/axios";
+import { redirectIfLoggedIn } from "../utils/authUtils";
+import { authInterceptor } from "../interceptors/axios";
 
 export const SignIn = () => {
+  redirectIfLoggedIn();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
@@ -34,6 +34,7 @@ export const SignIn = () => {
       localStorage.setItem("access_token", data.access);
       localStorage.setItem("refresh_token", data.refresh);
       window.location.href = "/";
+      
     } catch (error) {
       console.error("Logging error", error);
       if (error.response && error.response.data) {

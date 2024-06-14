@@ -2,6 +2,9 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import {
+  authInterceptor,
+} from "../interceptors/axios";
 
 export function Navigation() {
   const [isAuth, setIsAuth] = useState(false);
@@ -20,6 +23,8 @@ export function Navigation() {
         } catch (e) {
           setIsAuth(false);
           if (e.response.status === 401) {
+            // Clearing tokens in case there is one left in storage which is inactive. It fixes infinity loop with requests for auth
+            localStorage.clear();
             window.location.href = "/sign-in";
           } else {
             console.log(e);
@@ -37,6 +42,7 @@ export function Navigation() {
           {isAuth ? <Nav.Link href="/">Home</Nav.Link> : null}
         </Nav>
         <Nav>
+          {isAuth ? <Nav.Link href="/accounts">Account</Nav.Link> : null}
           {isAuth ? (
             <Nav.Link href="/logout">Logout</Nav.Link>
           ) : (

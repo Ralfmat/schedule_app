@@ -3,14 +3,17 @@ import { fetchData } from "../utils/apiUtils"
 import { fetchCurrentUserId } from "../utils/dataUtils"
 
 export const SubAccounts = () => {
-    const [accounts, setAccounts] = useState("")
+    const [employees, setEmployees] = useState([]);
+    const [managers, setManagers] = useState([]);
+
     useEffect(() => {
         const loadAccounts = async () => {
             try {
                 const userId = await fetchCurrentUserId();
+                // console.log(userId);
                 const response = await fetchData(`schedule/account/${userId}/sub-accounts`);
-                console.log(response.data.employee_set[0]);
-                setAccounts(response.data);
+                setEmployees(response.data.employee_set);
+                setManagers(response.data.manager_set);
             } catch (error) {
                 console.error("Error during fetching sub accounts:", error);
             }
@@ -18,13 +21,30 @@ export const SubAccounts = () => {
         loadAccounts();
     }, []);
     return (
-        <div className="list-group">
-            {/* {accounts.employee_set.map((employee) => (
-                <div key={employee.id} className="list-group-item">
-                    Hej jestem employee: {employee.id}
-                </div>
-            ))} */}
-            {/* {accounts.employee_set.account} */}
+        <div>
+            <h2>Employees</h2>
+            <ul>
+                {employees.map(emp => (
+                    <>
+                    <li>Account Id:{emp.account}</li>
+                    
+                    <li>Employee page</li>
+                    <br/>
+                    </>
+                ))}
+            </ul>
+
+            <h2>Managers</h2>
+            <ul>
+                {managers.map(man => (
+                    <>
+                    <li>Account Id:{man.account}</li>
+                    
+                    <li>Manager page</li>
+                    <br/>
+                    </>
+                ))}
+            </ul>
         </div>
     );
 };

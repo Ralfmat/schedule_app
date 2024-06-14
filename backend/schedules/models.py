@@ -21,6 +21,9 @@ class Manager(models.Model):
         db_table = 'managers'
         verbose_name = 'Manager'
         verbose_name_plural = 'Managers'
+        permissions = [
+            ("crud_employees", "Can performe operations on employee model")
+        ]
 
     def __str__(self) -> str:
         return f"Manager: {self.account}"

@@ -15,11 +15,9 @@ class AccountRegistration(CreateAPIView):
 class AccountDetail(RetrieveUpdateDestroyAPIView):
     queryset = Account.objects.all()
     serializer_class = AccountDetailSerializer
-    permission_class = (permissions.IsAuthenticated, )
 
 
 class GetCurrentUserId(APIView):
-    permission_classes = (permissions.IsAuthenticated, )
 
     def get(self, request):
         user = request.user
@@ -29,11 +27,9 @@ class GetCurrentUserId(APIView):
 class ListAccounts(ListAPIView):
     queryset = Account.objects.all()
     serializer_class = AccountDetailSerializer
-    permission_class = (permissions.IsAuthenticated, )
 
 
 class HomeView(APIView):
-    permission_classes = (permissions.IsAuthenticated, )
 
     def get(self, request):
         content = {'message': 'Home view response. You are authenticated!'}
@@ -41,7 +37,6 @@ class HomeView(APIView):
 
 
 class LogoutView(APIView):
-    permission_classes = (permissions.AllowAny, )
     def post(self, request):
         try:
             refresh_token = request.data["refresh_token"]
