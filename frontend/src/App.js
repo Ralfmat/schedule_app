@@ -6,6 +6,9 @@ import {Navigation} from './component/Navigation';
 import {Logout} from './component/Logout';
 import {SignUp} from './component/SignUp';
 import { SubAccounts } from './component/SubAccounts';
+import { Employee } from './component/Employee';
+import { Manager } from './component/Manager';
+import { Calendar } from './component/Calendar';
 
 function App() {
     return (
@@ -17,6 +20,9 @@ function App() {
           <Route path="/logout" element={<Logout/>}/>
           <Route path="/accounts" element={<SubAccounts/>}/>
           <Route path="/sign-up" element={<SignUp/>}/>
+          <Route path="/employee" element={<Employee/>}/>
+          <Route path="/manager" element={<Manager/>}/>
+          <Route path="/calendar" element={<Calendar/>}/>
         </Routes>
       </BrowserRouter>);
 }

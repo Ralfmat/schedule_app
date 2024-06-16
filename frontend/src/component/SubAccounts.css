@@ -1,0 +1,77 @@
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+.subaccount-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 30vh;
+}
+.loading-spinner {
+    margin-top: 10rem;
+    width: 10rem;
+    height: 10rem;
+    border: 4px solid rgba(195, 195, 195, 0.25);
+    border-radius: 50%;
+    border-top-color: #6f6f6f;
+    animation: spin 1s ease-in-out infinite;
+}
+
+.subaccounts-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    padding: 20px;
+    max-width: 800px;
+}
+
+.title {
+    text-align: center;
+    margin-top: 1rem;
+    margin-bottom: 6rem;
+}
+
+.subaccounts-sections {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 50%;
+}
+
+.subaccount-section {
+    border-radius: 10px;
+    margin: 0 10px;
+    text-align: center;
+    background-color: #0d6efd;
+    color: white;
+    margin-bottom: 5rem;
+}
+
+.subaccount-section h3 {
+    padding: 20px 10px 20px 10px;
+    margin: 0;
+    background-color: white;
+    color: black;
+    border: 1px solid #0d6efd;
+    
+}
+
+.subaccount-section ul{
+    padding: 10px;
+    margin: 0;
+}
+
+.subaccount-item {
+    border-radius: 5px;
+    list-style: none;
+}
+
+.to-be-clicked:hover{
+    cursor: pointer;
+}
+
+.subaccount-item div {
+    margin: 5px 0;
+}

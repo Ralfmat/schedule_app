@@ -2,9 +2,6 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import {
-  authInterceptor,
-} from "../interceptors/axios";
 
 export function Navigation() {
   const [isAuth, setIsAuth] = useState(false);
@@ -40,6 +37,7 @@ export function Navigation() {
         <Navbar.Brand href="/">JWT Authentication</Navbar.Brand>
         <Nav className="me-auto">
           {isAuth ? <Nav.Link href="/">Home</Nav.Link> : null}
+          {isAuth ? <Nav.Link href="/calendar">Calendar</Nav.Link> : null}
         </Nav>
         <Nav>
           {isAuth ? <Nav.Link href="/accounts">Account</Nav.Link> : null}

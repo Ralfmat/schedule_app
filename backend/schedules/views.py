@@ -10,6 +10,11 @@ class EmployeeDetail(RetrieveUpdateDestroyAPIView):
     serializer_class = EmployeeSerializer
     permission_class = (IsAuthenticated, )
 
+class ManagerDetail(RetrieveUpdateDestroyAPIView):
+    queryset = Manager.objects.all()
+    serializer_class = ManagerSerializer
+    # permission_class = (IsAuthenticated, )
+
 
 class EmployeeShfits(RetrieveUpdateDestroyAPIView):
     queryset = EmployeeShift.objects.all()

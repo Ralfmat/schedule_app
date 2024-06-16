@@ -7,7 +7,7 @@ from accounts.serializers import AccountDetailSerializer
 class ManagerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Manager
-        fields = ('account', )
+        fields = ('id', 'account', )
 
 
 class ManagerDetailSerializer(serializers.ModelSerializer):
@@ -22,7 +22,7 @@ class ManagerDetailSerializer(serializers.ModelSerializer):
 class EmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
-        fields = ('account', )
+        fields = ('id', 'account', )
 
 
 class EmployeeDetailSerializer(serializers.ModelSerializer):
