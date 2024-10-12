@@ -12,7 +12,7 @@ export const SubAccounts = () => {
         const fetchUserId = async () => {
             try {
                 const userId = await fetchCurrentUserId();
-                loadAccounts(userId);
+                loadSubAccounts(userId);
             } catch (error) {
                 console.error("Error during fetching user id:", error);
             }
@@ -21,7 +21,7 @@ export const SubAccounts = () => {
         fetchUserId();
     }, []);
 
-    const loadAccounts = async (userId) => {
+    const loadSubAccounts = async (userId) => {
         try {
             const response = await fetchData(`schedule/account/${userId}/sub-accounts`);
             setEmployees(response.data.employee_set);
@@ -62,7 +62,7 @@ export const SubAccounts = () => {
                             <h3>Employee account</h3>
                             <ul>
                                 <li key={index} className="subaccount-item">
-                                    <div onClick={handleManagerClick} className="to-be-clicked">Log in as employee</div>
+                                    <div onClick={handleEmployeeClick} className="to-be-clicked">Log in as employee</div>
                                     <br/>
                                     <div>Employee Id: {emp.id}</div>
                                 </li>

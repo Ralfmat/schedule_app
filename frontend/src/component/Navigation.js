@@ -34,7 +34,7 @@ export function Navigation() {
   return (
     <div>
       <Navbar bg="dark" variant="dark">
-        <Navbar.Brand href="/">JWT Authentication</Navbar.Brand>
+        <Navbar.Brand href="/">Schedule App</Navbar.Brand>
         <Nav className="me-auto">
           {isAuth ? <Nav.Link href="/">Home</Nav.Link> : null}
           {isAuth ? <Nav.Link href="/calendar">Calendar</Nav.Link> : null}
