@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
 class AccountSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
+    password = serializers.CharField(write_only=True, required=True)
 
     class Meta:
         model = Account
