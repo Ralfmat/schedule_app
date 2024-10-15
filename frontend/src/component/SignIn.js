@@ -2,6 +2,7 @@ import axios from "axios";
 import { useState } from "react";
 import { redirectIfLoggedIn } from "../utils/authUtils";
 import { authInterceptor } from "../interceptors/axios";
+import "./SignIn.css";
 
 export const SignIn = () => {
   redirectIfLoggedIn();
@@ -10,6 +11,7 @@ export const SignIn = () => {
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
+  const [showBadCredentials, setBadCredentials] = useState(false);
 
   axios.interceptors.request.eject(authInterceptor);
 
@@ -36,6 +38,7 @@ export const SignIn = () => {
       window.location.href = "/";
       
     } catch (error) {
+      setBadCredentials(true);
       console.error("Logging error", error);
       if (error.response && error.response.data) {
         setErrors(error.response.data);
@@ -55,6 +58,11 @@ export const SignIn = () => {
     } else if (e.target.name === "password") {
       setPassword(e.target.value);
     }
+  };
+
+  const closePopup = () => {
+    setBadCredentials(false);
+    setPassword("");
   };
 
   return (
@@ -101,6 +109,17 @@ export const SignIn = () => {
           </div>
         </div>
       </form>
+      {showBadCredentials && (
+        <div className="popup">
+          <div className="popup-content">
+            <h4>Incorrect email or password</h4>
+            <p>{errors.detail}</p>
+            <button onClick={closePopup} className="btn btn-danger">
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

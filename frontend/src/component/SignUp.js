@@ -67,11 +67,13 @@ export const SignUp = () => {
         const capitalizeFirstLetter = (str) => str.charAt(0).toUpperCase() + str.slice(1);
 
         let capitalizedErrors = Object.fromEntries(
-            Object.entries(error.response.data).map(([key, messages]) => [
-                key,
-                messages.map(capitalizeFirstLetter)
-            ])
-        );
+          Object.entries(error.response.data).map(([key, messages]) => [
+              key,
+              Array.isArray(messages)
+                ? messages.map(capitalizeFirstLetter)
+                : [capitalizeFirstLetter(messages)] // Wrap single message in an array
+          ])
+      );
         setErrors(capitalizedErrors);
       }
     }
