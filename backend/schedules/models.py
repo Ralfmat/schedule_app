@@ -1,36 +1,18 @@
 from django.db import models
 from accounts.models import Account
 
-
-class Employee(models.Model):
-    account = models.ForeignKey(Account, on_delete=models.CASCADE)
-
-    class Meta:
-        db_table = 'employee'
-        verbose_name = 'Employee'
-        verbose_name_plural = 'Employees'
-
-    def __str__(self) -> str:
-        return f"Employee: {self.account}"
-
-
-class Manager(models.Model):
-    account = models.ForeignKey(Account, on_delete=models.CASCADE)
-
-    class Meta:
-        db_table = 'managers'
-        verbose_name = 'Manager'
-        verbose_name_plural = 'Managers'
-        permissions = [
-            ("crud_employees", "Can performe operations on employee model")
-        ]
-
-    def __str__(self) -> str:
-        return f"Manager: {self.account}"
-
-    
 class WeekDay(models.Model):
-    day_name = models.CharField(max_length=50)
+    DAY_CHOICES = [
+        ('Monday', 'Monday'),
+        ('Tuesday', 'Tuesday'),
+        ('Wednesday', 'Wednesday'),
+        ('Thursday', 'Thursday'),
+        ('Friday', 'Friday'),
+        ('Saturday', 'Saturday'),
+        ('Sunday', 'Sunday')
+    ]
+
+    day_name = models.CharField(max_length=50, choices=DAY_CHOICES)
     open_at = models.TimeField()
     close_at = models.TimeField()
 
@@ -57,9 +39,19 @@ class Workday(models.Model):
 
 
 class Shift(models.Model):
+    STATUS_CHOICES = (
+        ('ACCEPTED', 'Accepted'),
+        ('WAITING', 'Waiting for Accept'),
+    )
+
     start_time = models.TimeField()
     end_time = models.TimeField()
-    workday = models.ForeignKey(Workday, on_delete=models.CASCADE)
+    workday = models.ForeignKey('Workday', on_delete=models.CASCADE)
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='WAITING'
+    )
 
     class Meta:
         db_table = 'shifts'
@@ -67,60 +59,55 @@ class Shift(models.Model):
         verbose_name_plural = 'Shifts'
 
     def __str__(self) -> str:
-        return f"Shift: {self.id}"
+        return f"Shift: {self.id} ({self.start_time}-{self.end_time}) - {self.status}"
 
 
-class EmployeeShift(models.Model):
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+class ShiftAssignment(models.Model):
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
     shift = models.ForeignKey(Shift, on_delete=models.CASCADE)
 
     class Meta:
-        db_table = 'employee_shifts'
-        verbose_name = 'Employee shift'
-        verbose_name_plural = 'Employee shifts'
+        db_table = 'shift_assignments'
+        verbose_name = 'Shift Assignment'
+        verbose_name_plural = 'Shift Assignments'
 
     def __str__(self) -> str:
-        return f"Employee shift: {self.employee.account.username} - {self.shift.id}"
+        return f"{self.account.username} assigned to Shift {self.shift.id}"
 
-
-class ManagerShift(models.Model):
-    manager = models.ForeignKey(Manager, on_delete=models.CASCADE)
-    shift = models.ForeignKey(Shift, on_delete=models.CASCADE)
+class ShiftSwapRequest(models.Model):
+    SHIFT_SWAP_STATUS_CHOICES = (
+        ('PENDING', 'Pending'),
+        ('EMPLOYEE_APPROVED', 'Employee Approved'),
+        ('MANAGER_APPROVED', 'Manager Approved'),
+        ('DECLINED', 'Declined')
+    )
+    
+    requesting_employee = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='requested_swaps')
+    target_employee = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='swap_targets')
+    shift = models.ForeignKey('Shift', on_delete=models.CASCADE)
+    status = models.CharField(max_length=20, choices=SHIFT_SWAP_STATUS_CHOICES, default='PENDING')
+    target_employee_approval = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        db_table = 'manager_shifts'
-        verbose_name = 'Manager shift'
-        verbose_name_plural = 'Manager shifts'
+        db_table = 'shift_swap_requests'
+        verbose_name = 'Shift Swap Request'
+        verbose_name_plural = 'Shift Swap Requests'
 
-    def __str__(self) -> str:
-        return f"Manager shift: {self.manager.account.username} - {self.shift.id}"
-    
+    def __str__(self):
+        return f"{self.requesting_employee.username} requests to swap with {self.target_employee.username} for Shift {self.shift.id}"
 
-class EmployeeAvailability(models.Model):
+
+class Availability(models.Model):
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    workday = models.ForeignKey('Workday', on_delete=models.CASCADE)
     start_time = models.TimeField()
     end_time = models.TimeField()
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    workday = models.ForeignKey(Workday, on_delete=models.CASCADE)
 
     class Meta:
-        db_table = 'employee_availabilities'
-        verbose_name = 'Employee availability'
-        verbose_name_plural = 'Employee availabilities'
+        db_table = 'availabilities'
+        verbose_name = 'Availability'
+        verbose_name_plural = 'Availabilities'
 
     def __str__(self) -> str:
-        return f"Employee availability: {self.employee.account.username} - {self.workday.date}"
-    
-
-
-class ManagerAvailability(models.Model):
-    start_time = models.TimeField()
-    end_time = models.TimeField()
-    manager = models.ForeignKey(Manager, on_delete=models.CASCADE)
-    workday = models.ForeignKey(Workday, on_delete=models.CASCADE)
-
-    class Meta:
-        db_table = 'manger_availabilities'
-        verbose_name = 'Manger availability'
-        verbose_name_plural = 'Manager availabilities'
-
-    
+        return f"{self.account.username} - {self.workday.date} ({self.start_time}-{self.end_time})"
