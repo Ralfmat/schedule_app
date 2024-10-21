@@ -1,33 +1,47 @@
 from rest_framework import serializers
-from schedules.models import Shift, ShiftAssignment, Availability, ShiftSwapRequest, WeekDay, Workday
+from schedules.models import Shift, ShiftAssignment, Availability, ShiftSwapRequest, Weekday, Workday
 from accounts.models import Account
 from accounts.serializers import AccountDetailSerializer
 
-# WeekDay Serializer
-class WeekDaySerializer(serializers.ModelSerializer):
+# Weekday Serializer
+class WeekdayCreateUpdateSerializer(serializers.ModelSerializer):
     class Meta:
-        model = WeekDay
+        model = Weekday
         fields = ('day_name', 'open_at', 'close_at')
 
     def validate(self, data):
         # Ensure 'close_at' time is after 'open_at' time
         if data['close_at'] <= data['open_at']:
             raise serializers.ValidationError("Closing time must be after opening time.")
-        return data   
+        return data
+
+class WeekdayDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Weekday
+        fields = ('day_name', 'open_at', 'close_at')
+
 # ---
 
-# Workday Serializer
-class WorkdaySerializer(serializers.ModelSerializer):
-    week_day = WeekDaySerializer(read_only=True)
+# Workday Serializers
+class WorkdayDetailSerializer(serializers.ModelSerializer):
+    week_day = WeekdayDetailSerializer(read_only=True)
     
     class Meta:
         model = Workday
         fields = ('date', 'week_day')
+
+class WorkdayCreateUpdateSerializer(serializers.ModelSerializer):
+    # Use PrimaryKeyRelatedField to refer to an existing Weekday by its ID for POST/PUT/PATCH
+    week_day = serializers.PrimaryKeyRelatedField(queryset=Weekday.objects.all())
+
+    class Meta:
+        model = Workday
+        fields = ['date', 'week_day']
 # ---
 
-# Shift Serializer and Shift Creation Serializer
+# Shift Serializer
 class ShiftSerializer(serializers.ModelSerializer):
-    workday = WorkdaySerializer(read_only=True)
+    workday = WorkdayDetailSerializer(read_only=True)
     
     class Meta:
         model = Shift
@@ -81,10 +95,10 @@ class ShiftSwapRequestSerializer(serializers.ModelSerializer):
         read_only_fields = ['status', 'created_at']
 # ---
 
-# Availability Serializer and Availability Creation Serializer
+# Availability Serializer
 class AvailabilitySerializer(serializers.ModelSerializer):
     account = AccountDetailSerializer(read_only=True)
-    workday = WorkdaySerializer(read_only=True)
+    workday = WorkdayDetailSerializer(read_only=True)
     
     class Meta:
         model = Availability
@@ -94,6 +108,21 @@ class AvailabilityCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Availability
         fields = ('account', 'start_time', 'end_time', 'workday')
+
+    def validate(self, data):
+        # Check if start time is before end time
+        if data['start_time'] >= data['end_time']:
+            raise serializers.ValidationError("End time must be after start time.")
+        
+        # Retrieve the associated workday to validate open hours
+        workday = data['workday']
+        weekday = workday.week_day
+        if data['start_time'] < weekday.open_at or data['end_time'] > weekday.close_at:
+            raise serializers.ValidationError(
+                f"Shift times must be within open hours: {weekday.open_at} - {weekday.close_at}."
+            )
+
+        return data
 # ---
 
 # Account with Related Shifts and Availability Serializer
@@ -105,3 +134,4 @@ class AccountShiftAvailabilitySerializer(serializers.ModelSerializer):
         model = Account
         fields = ('id', 'username', 'role', 'shiftassignment_set', 'availability_set')
 # ---
+

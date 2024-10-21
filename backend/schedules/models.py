@@ -1,7 +1,7 @@
 from django.db import models
 from accounts.models import Account
 
-class WeekDay(models.Model):
+class Weekday(models.Model):
     DAY_CHOICES = [
         ('Monday', 'Monday'),
         ('Tuesday', 'Tuesday'),
@@ -27,7 +27,7 @@ class WeekDay(models.Model):
 
 class Workday(models.Model):
     date = models.DateField()
-    week_day = models.ForeignKey(WeekDay, on_delete=models.CASCADE)
+    week_day = models.ForeignKey(Weekday, on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'workday'

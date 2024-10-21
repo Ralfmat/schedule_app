@@ -1,4 +1,4 @@
-from rest_framework.generics import RetrieveUpdateDestroyAPIView
+from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -7,41 +7,6 @@ from accounts.models import Account
 from schedules.models import *
 from schedules.serializers import *
 from schedules.permissions import IsManager, IsManagerOrReadOnly
-
-class AccountShiftsAvailabilityView(RetrieveUpdateDestroyAPIView):
-    permission_classes = (IsAuthenticated, )
-    serializer_class = AccountShiftAvailabilitySerializer
-
-    def get(self, request, pk):
-        try:
-            account = Account.objects.get(pk=pk)
-        except Account.DoesNotExist:
-            return Response({"error": "Account not found."}, status=status.HTTP_404_NOT_FOUND)
-        
-        serializer = AccountShiftAvailabilitySerializer(account)
-        return Response(serializer.data)
-
-    def put(self, request, pk):
-        try:
-            account = Account.objects.get(pk=pk)
-        except Account.DoesNotExist:
-            return Response({"error": "Account not found."}, status=status.HTTP_404_NOT_FOUND)
-        
-        serializer = AccountShiftAvailabilitySerializer(account, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk):
-        try:
-            account = Account.objects.get(pk=pk)
-        except Account.DoesNotExist:
-            return Response({"error": "Account not found."}, status=status.HTTP_404_NOT_FOUND)
-        
-        account.delete()
-        return Response({"message": "Account deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
-
 
 # Shift Assignment View for a Specific Account
 class AccountAssignedShiftsView(APIView):
@@ -98,41 +63,6 @@ class AccountAssignedShiftsView(APIView):
         
         shift_assignment.delete()
         return Response({"message": "Shift assignment deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
-
-
-# WeekDay Detail View
-class WeekDayDetailView(APIView):
-    permission_classes = (IsAuthenticated, )
-
-    def get(self, request, pk):
-        try:
-            weekday = WeekDay.objects.get(pk=pk)
-        except WeekDay.DoesNotExist:
-            return Response({"error": "Weekday not found."}, status=status.HTTP_404_NOT_FOUND)
-        
-        serializer = WeekDaySerializer(weekday)
-        return Response(serializer.data)
-
-    def put(self, request, pk):
-        try:
-            weekday = WeekDay.objects.get(pk=pk)
-        except WeekDay.DoesNotExist:
-            return Response({"error": "Weekday not found."}, status=status.HTTP_404_NOT_FOUND)
-        
-        serializer = WeekDaySerializer(weekday, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk):
-        try:
-            weekday = WeekDay.objects.get(pk=pk)
-        except WeekDay.DoesNotExist:
-            return Response({"error": "Weekday not found."}, status=status.HTTP_404_NOT_FOUND)
-        
-        weekday.delete()
-        return Response({"message": "Weekday deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
 
 
 # Workday Shifts Management View

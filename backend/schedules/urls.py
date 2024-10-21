@@ -1,13 +1,28 @@
 from django.urls import path
-from .views import *
+from .views.availability_views import *
+from .views.shift_views import *
+from .views.weekday_views import *
+from .views.workday_views import *
 
 urlpatterns = [
-    # path('account/<int:pk>/', AccountShiftsAvailabilityView.as_view(), name='account_shifts_availability'),
-    path('account/<int:pk>/assigned_shifts/', AccountAssignedShiftsView.as_view(), name='account_assigned_shifts'),
-    path('weekdays/<int:pk>/', WeekDayDetailView.as_view(), name='weekday_detail'),
-    path('workday/<int:workday_id>/shifts/', WorkdayShiftManagementView.as_view(), name='workday_shift_management'),
-    path('shift/assign/', ShiftAssignmentView.as_view(), name='shift_assignment'),
-    path('shift_swap/', ShiftSwapRequestCreateView.as_view(), name='shift_swap_create'),
-    path('shift_swap/<int:pk>/employee_approve/', ShiftSwapEmployeeApprovalView.as_view(), name='shift_swap_employee_approve'),
-    path('shift_swap/<int:pk>/manager_approve/', ShiftSwapManagerApprovalView.as_view(), name='shift_swap_manager_approve'),
+    path('availability/<int:pk>/', AccountAvailabilityView.as_view(), name='account_availability'),
+    path('workdays/', WorkdayListView.as_view(), name='workday-list'),
+    path('workdays/create/', WorkdayCreateView.as_view(), name='workday-create'),
+    path('workdays/<int:pk>/', WorkdayDetailView.as_view(), name='workday-detail'),
+    path('workdays/update/<int:pk>/', WorkdayUpdateView.as_view(), name='workday-update'),
+    path('workdays/delete/<int:pk>/', WorkdayDeleteView.as_view(), name='workday-delete'),
+    path('weekdays/', WeekdayListView.as_view(), name='weekday-list'),
+    path('weekdays/create/', WeekdayCreateView.as_view(), name='weekday-create'),
+    path('weekdays/<int:pk>/', WeekdayDetailView.as_view(), name='weekday-detail'),
+    path('weekdays/update/<int:pk>/', WeekdayUpdateView.as_view(), name='weekday-update'),
+    path('weekdays/delete/<int:pk>/', WeekdayDeleteView.as_view(), name='weekday-delete'),
+    
+    # path('account/<int:pk>/assigned_shifts/', AccountAssignedShiftsView.as_view(), name='account_assigned_shifts'),
+    # path('weekdays/<int:pk>/', WeekDayDetailView.as_view(), name='weekday_detail'),
+    
+    # path('workday/<int:workday_id>/shifts/', WorkdayShiftManagementView.as_view(), name='workday_shift_management'),
+    # path('shift/assign/', ShiftAssignmentView.as_view(), name='shift_assignment'),
+    # path('shift_swap/', ShiftSwapRequestCreateView.as_view(), name='shift_swap_create'),
+    # path('shift_swap/<int:pk>/employee_approve/', ShiftSwapEmployeeApprovalView.as_view(), name='shift_swap_employee_approve'),
+    # path('shift_swap/<int:pk>/manager_approve/', ShiftSwapManagerApprovalView.as_view(), name='shift_swap_manager_approve'),
 ]
