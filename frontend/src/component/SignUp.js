@@ -157,6 +157,7 @@ export const SignUp = () => {
               type="tel"
               value={phoneNumber}
               required
+              maxLength={9}
               onChange={(e) => setPhoneNumber(e.target.value)}
             />
             {errors.phone_number && errors.phone_number.map((error, index) => (
