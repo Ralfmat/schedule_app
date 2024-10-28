@@ -105,9 +105,13 @@ class AvailabilitySerializer(serializers.ModelSerializer):
         fields = ('id', 'account', 'start_time', 'end_time', 'workday')
 
 class AvailabilityCreateSerializer(serializers.ModelSerializer):
+    # Use PrimaryKeyRelatedField to expect only the ID for foreign key fields
+    account_id = serializers.PrimaryKeyRelatedField(queryset=Account.objects.all(), source='account')
+    workday_id = serializers.PrimaryKeyRelatedField(queryset=Workday.objects.all(), source='workday')
+
     class Meta:
         model = Availability
-        fields = ('account', 'start_time', 'end_time', 'workday')
+        fields = ('account_id', 'start_time', 'end_time', 'workday_id')
 
     def validate(self, data):
         # Check if start time is before end time
