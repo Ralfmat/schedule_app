@@ -39,62 +39,6 @@ class WorkdayCreateUpdateSerializer(serializers.ModelSerializer):
         fields = ['date', 'week_day']
 # ---
 
-# Shift Serializer
-class ShiftSerializer(serializers.ModelSerializer):
-    workday = WorkdayDetailSerializer(read_only=True)
-    
-    class Meta:
-        model = Shift
-        fields = ('id', 'start_time', 'end_time', 'status', 'workday')
-
-class ShiftCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Shift
-        fields = ('id', 'start_time', 'end_time', 'status', 'workday')
-    
-    def validate(self, data):
-        # Check if start time is before end time
-        if data['start_time'] >= data['end_time']:
-            raise serializers.ValidationError("End time must be after start time.")
-        
-        # Retrieve the associated workday to validate open hours
-        workday = data['workday']
-        weekday = workday.week_day
-        if data['start_time'] < weekday.open_at or data['end_time'] > weekday.close_at:
-            raise serializers.ValidationError(
-                f"Shift times must be within open hours: {weekday.open_at} - {weekday.close_at}."
-            )
-
-        return data
-# ---
-
-# Shift Assignment Serializer
-class ShiftAssignmentSerializer(serializers.ModelSerializer):
-    account = AccountDetailSerializer(read_only=True)
-    shift = ShiftSerializer(read_only=True)
-    
-    class Meta:
-        model = ShiftAssignment
-        fields = ('account', 'shift')
-
-class ShiftAssignmentCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ShiftAssignment
-        fields = ('account', 'shift')
-# ---
-
-# Shift Swap Request Serializer
-class ShiftSwapRequestSerializer(serializers.ModelSerializer):
-    requesting_employee = AccountDetailSerializer(read_only=True)
-    target_employee = AccountDetailSerializer(read_only=True)
-    shift = ShiftSerializer(read_only=True)
-    
-    class Meta:
-        model = ShiftSwapRequest
-        fields = ['id', 'requesting_employee', 'target_employee', 'shift', 'status', 'target_employee_approval', 'created_at']
-        read_only_fields = ['status', 'created_at']
-# ---
-
 # Availability Serializer
 class AvailabilitySerializer(serializers.ModelSerializer):
     account = AccountDetailSerializer(read_only=True)
@@ -127,6 +71,67 @@ class AvailabilityCreateSerializer(serializers.ModelSerializer):
             )
 
         return data
+# ---
+
+# Shift Serializer
+class ShiftSerializer(serializers.ModelSerializer):
+    workday = WorkdayDetailSerializer(read_only=True)
+    
+    class Meta:
+        model = Shift
+        fields = ('id', 'start_time', 'end_time', 'workday')
+
+class ShiftCreateSerializer(serializers.ModelSerializer):
+    workday_id = serializers.PrimaryKeyRelatedField(queryset=Workday.objects.all(), source='workday')
+
+    class Meta:
+        model = Shift
+        fields = ('id', 'start_time', 'end_time', 'workday_id')
+    
+    def validate(self, data):
+        # Check if start time is before end time
+        if data['start_time'] >= data['end_time']:
+            raise serializers.ValidationError("End time must be after start time.")
+        
+        # Retrieve the associated workday to validate open hours
+        workday = data['workday']
+        weekday = workday.week_day
+        if data['start_time'] < weekday.open_at or data['end_time'] > weekday.close_at:
+            raise serializers.ValidationError(
+                f"Shift times must be within open hours: {weekday.open_at} - {weekday.close_at}."
+            )
+
+        return data
+# ---
+
+# Shift Assignment Serializer
+class ShiftAssignmentSerializer(serializers.ModelSerializer):
+    account = AccountDetailSerializer(read_only=True)  # For detailed account info
+    shift = ShiftSerializer(read_only=True)            # For detailed shift info
+    
+    class Meta:
+        model = ShiftAssignment
+        fields = ['account', 'shift']
+
+class ShiftAssignmentCreateSerializer(serializers.ModelSerializer):
+    account_id = serializers.PrimaryKeyRelatedField(queryset=Account.objects.all(), source='account')
+    shift_id = serializers.PrimaryKeyRelatedField(queryset=Shift.objects.all(), source='shift')
+
+    class Meta:
+        model = ShiftAssignment
+        fields = ['account_id', 'shift_id']
+# ---
+
+# Shift Swap Request Serializer
+class ShiftSwapRequestSerializer(serializers.ModelSerializer):
+    requesting_employee = AccountDetailSerializer(read_only=True)
+    target_employee = AccountDetailSerializer(read_only=True)
+    shift = ShiftSerializer(read_only=True)
+    
+    class Meta:
+        model = ShiftSwapRequest
+        fields = ['id', 'requesting_employee', 'target_employee', 'shift', 'status', 'target_employee_approval', 'created_at']
+        read_only_fields = ['status', 'created_at']
 # ---
 
 # Account with Related Shifts and Availability Serializer

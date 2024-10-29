@@ -1,7 +1,3 @@
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
 from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveAPIView, DestroyAPIView, UpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 from schedules.permissions import IsManager
@@ -11,23 +7,23 @@ from schedules.serializers import *
 
 class WeekdayDetailView(RetrieveAPIView):
     # permission_classes = (IsAuthenticated, )
-    serializer_class = WeekdayDetailSerializer
     queryset = Weekday.objects.all()
+    serializer_class = WeekdayDetailSerializer
 
 class WeekdayListView(ListAPIView):
     # permission_classes = (IsAuthenticated, )
-    serializer_class = WeekdayDetailSerializer
     queryset = Weekday.objects.all()
+    serializer_class = WeekdayDetailSerializer
 
 class WeekdayCreateView(CreateAPIView):
     # permission_class = (IsAuthenticated, IsManager)
-    serializer_class = WeekdayCreateUpdateSerializer
     queryset = Weekday.objects.all()
+    serializer_class = WeekdayCreateUpdateSerializer
 
 class WeekdayUpdateView(UpdateAPIView):
     # permission_class = (IsAuthenticated, IsManager)
-    serializer_class = WeekdayCreateUpdateSerializer
     queryset = Weekday.objects.all()
+    serializer_class = WeekdayCreateUpdateSerializer
 
     def patch(self, request, *args, **kwargs):
         return self.partial_update(request, *args, **kwargs)

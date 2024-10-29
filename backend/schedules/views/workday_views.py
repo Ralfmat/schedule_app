@@ -12,13 +12,13 @@ class WorkdayDetailView(RetrieveAPIView):
 
 class WorkdayListView(ListAPIView):
     # permission_classes = (IsAuthenticated, )
-    serializer_class = WorkdayDetailSerializer
     queryset = Workday.objects.all()
+    serializer_class = WorkdayDetailSerializer
 
 class WorkdayCreateView(CreateAPIView):
     # permission_class = (IsAuthenticated, IsManager)
-    serializer_class = WorkdayCreateUpdateSerializer
     queryset = Workday.objects.all()
+    serializer_class = WorkdayCreateUpdateSerializer
 
 class WorkdayUpdateView(UpdateAPIView):
     # permission_class = (IsAuthenticated, IsManager)

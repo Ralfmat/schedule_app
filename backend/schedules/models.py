@@ -38,20 +38,25 @@ class Workday(models.Model):
         return f"Workday: {self.date}"
 
 
-class Shift(models.Model):
-    STATUS_CHOICES = (
-        ('ACCEPTED', 'Accepted'),
-        ('WAITING', 'Waiting for Accept'),
-    )
+class Availability(models.Model):
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    workday = models.ForeignKey('Workday', on_delete=models.CASCADE)
+    start_time = models.TimeField()
+    end_time = models.TimeField()
 
+    class Meta:
+        db_table = 'availabilities'
+        verbose_name = 'Availability'
+        verbose_name_plural = 'Availabilities'
+
+    def __str__(self) -> str:
+        return f"{self.account.username} - {self.workday.date} ({self.start_time}-{self.end_time})"
+
+
+class Shift(models.Model):
     start_time = models.TimeField()
     end_time = models.TimeField()
     workday = models.ForeignKey('Workday', on_delete=models.CASCADE)
-    status = models.CharField(
-        max_length=20,
-        choices=STATUS_CHOICES,
-        default='WAITING'
-    )
 
     class Meta:
         db_table = 'shifts'
@@ -59,7 +64,7 @@ class Shift(models.Model):
         verbose_name_plural = 'Shifts'
 
     def __str__(self) -> str:
-        return f"Shift: {self.id} ({self.start_time}-{self.end_time}) - {self.status}"
+        return f"Shift: {self.id} ({self.start_time}-{self.end_time})"
 
 
 class ShiftAssignment(models.Model):
@@ -97,17 +102,3 @@ class ShiftSwapRequest(models.Model):
     def __str__(self):
         return f"{self.requesting_employee.username} requests to swap with {self.target_employee.username} for Shift {self.shift.id}"
 
-
-class Availability(models.Model):
-    account = models.ForeignKey(Account, on_delete=models.CASCADE)
-    workday = models.ForeignKey('Workday', on_delete=models.CASCADE)
-    start_time = models.TimeField()
-    end_time = models.TimeField()
-
-    class Meta:
-        db_table = 'availabilities'
-        verbose_name = 'Availability'
-        verbose_name_plural = 'Availabilities'
-
-    def __str__(self) -> str:
-        return f"{self.account.username} - {self.workday.date} ({self.start_time}-{self.end_time})"
