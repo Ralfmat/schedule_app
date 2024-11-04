@@ -2,7 +2,7 @@
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
-.subaccount-container {
+.account-container {
     display: flex;
     justify-content: center;
     margin-top: 30vh;
@@ -17,7 +17,7 @@
     animation: spin 1s ease-in-out infinite;
 }
 
-.subaccounts-container {
+.account-container {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -33,14 +33,14 @@
     margin-bottom: 6rem;
 }
 
-.subaccounts-sections {
+.account-sections {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     width: 50%;
 }
 
-.subaccount-section {
+.account-section {
     border-radius: 10px;
     margin: 0 10px;
     text-align: center;
@@ -49,7 +49,7 @@
     margin-bottom: 5rem;
 }
 
-.subaccount-section h3 {
+.account-section h3 {
     padding: 20px 10px 20px 10px;
     margin: 0;
     background-color: white;
@@ -58,12 +58,12 @@
     
 }
 
-.subaccount-section ul{
+.account-section ul{
     padding: 10px;
     margin: 0;
 }
 
-.subaccount-item {
+.account-item {
     border-radius: 5px;
     list-style: none;
 }
@@ -72,6 +72,6 @@
     cursor: pointer;
 }
 
-.subaccount-item div {
+.account-item div {
     margin: 5px 0;
 }
