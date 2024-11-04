@@ -15,7 +15,22 @@ class AccountRegistration(CreateAPIView):
 class AccountDetail(RetrieveUpdateDestroyAPIView):
     queryset = Account.objects.all()
     serializer_class = AccountDetailSerializer
+    # permission_class =
 
+    def get_queryset(self):
+        user = self.request.user
+        if user.role == 'MANAGER':
+            return Account.objects.all()
+        return Account.objects.filter(account=user)
+    
+class AccountMeView(APIView):
+    # permission_class = (IsAuthenticated, )
+
+    def get(self, request):
+        user = request.user
+        serializer = AccountDetailSerializer(user)
+        return Response(serializer.data)
+        
 
 class GetCurrentUserId(APIView):
 

@@ -37,7 +37,7 @@ class ShiftAssignmentDetailView(RetrieveAPIView):
     def get_queryset(self):
         # Filter the queryset to allow only managers or the assigned employee to access
         user = self.request.user
-        if user.role == 'MANAGER':  # Assuming your account model has a 'role' field for managers
+        if user.role == 'MANAGER':
             return ShiftAssignment.objects.all()
         return ShiftAssignment.objects.filter(account=user)
 
