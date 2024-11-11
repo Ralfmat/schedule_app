@@ -9,6 +9,7 @@ import { Account } from './component/Account';
 import { Employee } from './component/Employee';
 import { Manager } from './component/Manager';
 import { Calendar } from './component/Calendar';
+import { Shift } from './component/Shift';
 
 function App() {
     return (
@@ -23,6 +24,7 @@ function App() {
           <Route path="/employee" element={<Employee/>}/>
           <Route path="/manager" element={<Manager/>}/>
           <Route path="/calendar" element={<Calendar/>}/>
+          <Route path="/shifts" element={<Shift/>}/>
         </Routes>
       </BrowserRouter>);
 }
