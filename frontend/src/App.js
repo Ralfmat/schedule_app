@@ -9,7 +9,7 @@ import { Account } from './component/Account';
 import { Employee } from './component/Employee';
 import { Manager } from './component/Manager';
 import { Calendar } from './component/Calendar';
-import { Shift } from './component/Shift';
+import { Dashboard } from './component/Dashboard';
 
 function App() {
     return (
@@ -24,7 +24,7 @@ function App() {
           <Route path="/employee" element={<Employee/>}/>
           <Route path="/manager" element={<Manager/>}/>
           <Route path="/calendar" element={<Calendar/>}/>
-          <Route path="/shifts" element={<Shift/>}/>
+          <Route path="/dashboard" element={<Dashboard/>}/>
         </Routes>
       </BrowserRouter>);
 }

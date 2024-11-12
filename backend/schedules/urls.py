@@ -12,7 +12,7 @@ urlpatterns = [
     path('workdays/update/<int:pk>/', WorkdayUpdateView.as_view(), name='workday-update'),
     path('workdays/delete/<int:pk>/', WorkdayDeleteView.as_view(), name='workday-delete'),
 
-    path('weekdays/', WeekdayListView.as_view(), name='weekday-list'),
+    path('weekdays/', WeekdayListView.as_view(), name='weekday-list'),  # Pass boolean future_only query param
     path('weekdays/create/', WeekdayCreateView.as_view(), name='weekday-create'),
     path('weekdays/<int:pk>/', WeekdayDetailView.as_view(), name='weekday-detail'),
     path('weekdays/update/<int:pk>/', WeekdayUpdateView.as_view(), name='weekday-update'),

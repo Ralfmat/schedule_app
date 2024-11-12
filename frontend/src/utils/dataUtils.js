@@ -1,4 +1,4 @@
-import { fetchData } from "./apiUtils"
+import { fetchData, postData } from "./apiUtils"
 
 export const fetchCurrentAccount = async () => {
     try {
@@ -45,5 +45,37 @@ export const fetchAssignments = async (workday_id) => {
         return response.data;
     } catch (error) {
         console.error("Error fetching assignments:", error);
+    }
+};
+
+export const fetchWeekdays = async () => {
+    try {
+        const response = await fetchData("schedule/weekdays/");
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching weekdyas:", error);
+    }
+};
+
+export const fetchWorkdays = async (future_only) => {
+    // If future_only is "true" function returns workdays with date equal today or later.
+    // If future_only is "false" whole query is retured.
+    try {
+        const endpoint = future_only
+        ? `schedule/workdays/?future_only=${future_only}`
+        : `schedule/workdays/`;
+        const response = await fetchData(endpoint);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching workdays:", error);
+    }
+};
+
+export const postWorkday = async (data) => {
+    try {
+        const request = await postData("schedule/workdays/create/", data);
+        return request.data;
+    } catch (error) {
+        console.error("Error fetching weekdyas:", error);
     }
 };

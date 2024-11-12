@@ -26,7 +26,7 @@ class Weekday(models.Model):
 
 
 class Workday(models.Model):
-    date = models.DateField()
+    date = models.DateField(unique=True)
     week_day = models.ForeignKey(Weekday, on_delete=models.CASCADE)
 
     class Meta:

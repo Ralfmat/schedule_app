@@ -38,7 +38,7 @@ export function Navigation() {
         <Nav className="me-auto">
           {isAuth ? <Nav.Link href="/">Home</Nav.Link> : null}
           {isAuth ? <Nav.Link href="/calendar">Calendar</Nav.Link> : null}
-          {isAuth ? <Nav.Link href="/shifts">Shifts</Nav.Link> : null}
+          {isAuth ? <Nav.Link href="/dashboard">Dashboard</Nav.Link> : null}
         </Nav>
         <Nav>
           {isAuth ? <Nav.Link href="/account">Account</Nav.Link> : null}

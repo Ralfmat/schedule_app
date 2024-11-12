@@ -18,7 +18,7 @@ class WeekdayCreateUpdateSerializer(serializers.ModelSerializer):
 class WeekdayDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Weekday
-        fields = ('day_name', 'open_at', 'close_at')
+        fields = ('id', 'day_name', 'open_at', 'close_at')
 
 # ---
 

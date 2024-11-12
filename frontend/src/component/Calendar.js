@@ -3,6 +3,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction'; // for date click handling
 import { useState, useEffect } from 'react';
 import { fetchAvailability, fetchShifts, fetchAssignments } from '../utils/dataUtils';
+import './Calendar.css'
 
 export const Calendar = () => {
     const [availabilities, setAvailabilties] = useState([]);
@@ -30,8 +31,8 @@ export const Calendar = () => {
       // Transform availabilities and assignments into calendar event format
       const availabilityEvents = availabilities.map((availability) => ({
           title: 'Availability',
-          start: new Date(`${availability.workday.date}T${availability.start_time}`), // Combine workday.date with start_time
-          end: new Date(`${availability.workday.date}T${availability.end_time}`), // Combine workday.date with end_time
+          start: new Date(`${availability.workday.date}`), // Combine workday.date with start_time
+          end: new Date(`${availability.workday.date}`), // Combine workday.date with end_time
           extendedProps: {
               type: 'availability',
               account: availability.account_id,
@@ -59,12 +60,32 @@ export const Calendar = () => {
     };
 
     return (
+      <div className='calendar-group'>
+        <div className='calendar-buttons'>
+          <h1>PLUS SIGN +++</h1>
+        </div>
+        <div className='calendar-window'>
         <FullCalendar
-            plugins={[dayGridPlugin, interactionPlugin]}
-            initialView="dayGridMonth"
-            events={events}
-            dateClick={handleDateClick} // Handles clicks on dates
-        />
+                plugins={[dayGridPlugin, interactionPlugin]}
+                initialView="dayGridMonth"
+                customButtons={{
+                    addAvailability: {
+                        text: '+',
+                        // click: handleOpenModal,
+                    },
+                }}
+                headerToolbar={{
+                    left: 'prev,next today', // Add custom button here
+                    center: 'title',
+                    right: 'addAvailability dayGridMonth,dayGridWeek',
+                }}
+                footerToolbar={{}}
+                height={"80vh"}
+                selectable={true}
+            />
+        </div>
+      </div>
+        
     );
 };
 
