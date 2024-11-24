@@ -1,4 +1,4 @@
-import { fetchData, postData } from "./apiUtils"
+import { deleteData, fetchData, postData } from "./apiUtils"
 
 export const fetchCurrentAccount = async () => {
     try {
@@ -79,3 +79,12 @@ export const postWorkday = async (data) => {
         console.error("Error fetching weekdyas:", error);
     }
 };
+
+export const deleteWorkday = async (workday_id) => {
+    try {
+        const request = await deleteData(`schedule/workdays/delete/${workday_id}`);
+        return request.data;
+    } catch (error) {
+        console.error("Error fetching weekdyas:", error);
+    }
+}

@@ -31,3 +31,19 @@ export const postData = async (endpoint, data) => {
         throw error;
     }
 };
+
+export const deleteData = async (endpoint) => {
+    const config = {
+        method: 'delete',
+        url: `http://127.0.0.1:8000/${endpoint}`,
+        headers: {
+            "Content-Type": "application/json"
+        }
+    };
+    try {
+        const response = await axios(config);
+        return response.data; // Return the response data, if any
+    } catch (error) {
+        throw error; // Propagate the error to the caller
+    }
+};

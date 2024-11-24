@@ -10,7 +10,7 @@ import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
 import './Dashboard.css';
 
-import { fetchWeekdays, fetchWorkdays, postWorkday } from '../utils/dataUtils';
+import { fetchWeekdays, fetchWorkdays, postWorkday, deleteWorkday } from '../utils/dataUtils';
 
 export const Dashboard = () => {
     const [selectedDate, setSelectedDate] = useState(null);
@@ -21,6 +21,7 @@ export const Dashboard = () => {
     const [formData, setFormData] = useState({
         week_day: '',
     });
+    const [isWorkdaySelected, setIsWorkdaySelected] = useState(false);
 
     const today = new Date();
 
@@ -45,7 +46,9 @@ export const Dashboard = () => {
     const handleDateSelect = (selectionInfo) => {
         const { startStr } = selectionInfo;
         setSelectedDate(startStr);
-        
+        const isWorkday = workdays.some((workday) => workday.date === startStr);
+        setIsWorkdaySelected(isWorkday);
+
         // Determine the selected weekday based on the date
         const date = new Date(startStr);
         const weekdayName = date.toLocaleString('en-US', { weekday: 'long' }).toLowerCase();
@@ -74,14 +77,6 @@ export const Dashboard = () => {
         setModalType('');
     };
 
-    const handleInputChange = (event) => {
-        const { name, value } = event.target;
-        setFormData((prevFormData) => ({
-            ...prevFormData,
-            [name]: value,
-        }));
-    };
-
     const handleConfirm = async () => {
         try {
             // Find the weekday ID based on the weekday name in formData
@@ -105,12 +100,48 @@ export const Dashboard = () => {
             //       Limit access to only manager user
 
             console.log("Submitting data:", data);
-            postWorkday(data);
+            await postWorkday(data);
+            const updatedWorkdays = await fetchWorkdays(true);
+            setWorkdays(updatedWorkdays);
             handleCloseModal();
         } catch (error) {
             console.error("Error creating workday:", error);
         }
     };
+
+    const handleRemoveWorkday = async () => {
+        if (!selectedDate) return;
+
+        try {
+            // Find the workday ID for the selected date
+            const workdayToRemove = workdays.find((workday) => workday.date === selectedDate);
+            console.log(workdayToRemove);
+            
+            if (workdayToRemove) {
+                await deleteWorkday(workdayToRemove.id); // Assuming workday has an `id` field
+                const updatedWorkdays = await fetchWorkdays(true);
+                setWorkdays(updatedWorkdays);
+
+                // Reset selection
+                setSelectedDate(null);
+                setIsWorkdaySelected(false);
+            }
+        } catch (error) {
+            console.error("Error removing workday:", error);
+        }
+    };
+
+    const createBackgroundEvents = (workdays) => {
+        return workdays.map((workday) => ({
+            start: workday.date, // Start of the workday (ISO 8601 format)
+            end: workday.date,   // End is the same for single-day background events
+            display: 'background',
+            color: '#ff9999', // Optional: Background color
+        }));
+    };
+
+    
+    const backgroundEvents = createBackgroundEvents(workdays);
 
     return (
         <div className='dashboard-window'>
@@ -119,9 +150,19 @@ export const Dashboard = () => {
                 <Button variant="contained" color="primary" onClick={() => handleOpenModal('createWorkday')}>
                     Create Workday
                 </Button>
+                <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={handleRemoveWorkday}
+                    disabled={!isWorkdaySelected} // Disable unless a workday is selected
+                    sx={{ ml: 2 }}
+                >
+                    Remove Workday
+                </Button>
             </div>
             <div className='dashboard-calendar'>
                 <FullCalendar
+                    key={backgroundEvents.length}
                     firstDay={1}
                     weekends={true}
                     height={"60vh"}
@@ -134,6 +175,7 @@ export const Dashboard = () => {
                         center: 'title',
                         right: 'dayGridMonth,dayGridWeek',
                     }}
+                    events={backgroundEvents}
                 />
             </div>
 
@@ -157,39 +199,24 @@ export const Dashboard = () => {
                     }}
                 >
                     <Typography id="modal-title" variant="h6" component="h2">
-                        Create Workday
+                        Workday Details
                     </Typography>
-                    {/* Display weekday name as non-editable text */}
-                    <TextField
-                        label="Weekday"
-                        value={formData.weekday ? formData.weekday.charAt(0).toUpperCase() + formData.weekday.slice(1) : ''}
-                        fullWidth
-                        margin="normal"
-                        input={{
-                            readOnly: true,
-                        }}
-                    />
-                    <TextField
-                        label="Open Time"
-                        type="time"
-                        name="open_at"
-                        value={formData.open_at}
-                        onChange={handleInputChange}
-                        fullWidth
-                        margin="normal"
-                    />
-                    <TextField
-                        label="Close Time"
-                        type="time"
-                        name="close_at"
-                        value={formData.close_at}
-                        onChange={handleInputChange}
-                        fullWidth
-                        margin="normal"
-                    />
-                    <Box display="flex" justifyContent="space-between" mt={2}>
+                    {/* Display weekday name */}
+                    <Typography variant="body1" sx={{ mt: 2 }}>
+                        <strong>Weekday:</strong> {formData.week_day ? formData.week_day.charAt(0).toUpperCase() + formData.week_day.slice(1) : 'N/A'}
+                    </Typography>
+                    {/* Display open time */}
+                    <Typography variant="body1" sx={{ mt: 2 }}>
+                        <strong>Open Time:</strong> {formData.open_at ? formData.open_at : 'N/A'}
+                    </Typography>
+                    {/* Display close time */}
+                    <Typography variant="body1" sx={{ mt: 2 }}>
+                        <strong>Close Time:</strong> {formData.close_at ? formData.close_at : 'N/A'}
+                    </Typography>
+                    {/* Buttons */}
+                    <Box display="flex" justifyContent="space-between" mt={4}>
                         <Button onClick={handleCloseModal} variant="outlined" color="secondary">
-                            Cancel
+                            Close
                         </Button>
                         <Button onClick={handleConfirm} variant="contained" color="primary">
                             Confirm

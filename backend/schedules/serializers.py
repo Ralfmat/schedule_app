@@ -28,7 +28,7 @@ class WorkdayDetailSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Workday
-        fields = ('date', 'week_day')
+        fields = ('id', 'date', 'week_day')
 
 class WorkdayCreateUpdateSerializer(serializers.ModelSerializer):
     # Use PrimaryKeyRelatedField to refer to an existing Weekday by its ID for POST/PUT/PATCH
