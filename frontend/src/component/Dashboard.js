@@ -15,6 +15,7 @@ import { fetchWeekdays, fetchWorkdays, postWorkday, deleteWorkday } from '../uti
 export const Dashboard = () => {
     const [selectedDate, setSelectedDate] = useState(null);
     const [openModal, setOpenModal] = useState(false);
+    const [confirmDeleteModalOpen, setConfirmDeleteModalOpen] = useState(false);
     const [modalType, setModalType] = useState(''); // To track which modal to open
     const [weekdays, setWeekdays] = useState([]);
     const [workdays, setWorkdays] = useState([]);
@@ -118,7 +119,7 @@ export const Dashboard = () => {
             console.log(workdayToRemove);
             
             if (workdayToRemove) {
-                await deleteWorkday(workdayToRemove.id); // Assuming workday has an `id` field
+                await deleteWorkday(workdayToRemove.id);
                 const updatedWorkdays = await fetchWorkdays(true);
                 setWorkdays(updatedWorkdays);
 
@@ -128,15 +129,18 @@ export const Dashboard = () => {
             }
         } catch (error) {
             console.error("Error removing workday:", error);
+        } finally {
+            setConfirmDeleteModalOpen(false);
         }
     };
+
 
     const createBackgroundEvents = (workdays) => {
         return workdays.map((workday) => ({
             start: workday.date, // Start of the workday (ISO 8601 format)
             end: workday.date,   // End is the same for single-day background events
             display: 'background',
-            color: '#ff9999', // Optional: Background color
+            color: '#ff9999',
         }));
     };
 
@@ -147,13 +151,16 @@ export const Dashboard = () => {
         <div className='dashboard-window'>
             <div className='dashboard-toolbar'>
                 <h1>Dashboard Toolbar</h1>
-                <Button variant="contained" color="primary" onClick={() => handleOpenModal('createWorkday')}>
+                <Button variant="contained"
+                color="primary"
+                onClick={() => handleOpenModal('createWorkday')}
+                disabled={isWorkdaySelected}>
                     Create Workday
                 </Button>
                 <Button
                     variant="contained"
                     color="secondary"
-                    onClick={handleRemoveWorkday}
+                    onClick={() => setConfirmDeleteModalOpen(true)}
                     disabled={!isWorkdaySelected} // Disable unless a workday is selected
                     sx={{ ml: 2 }}
                 >
@@ -165,7 +172,7 @@ export const Dashboard = () => {
                     key={backgroundEvents.length}
                     firstDay={1}
                     weekends={true}
-                    height={"60vh"}
+                    height={"70vh"}
                     plugins={[dayGridPlugin, interactionPlugin]}
                     initialView="dayGridMonth"
                     selectable={true}
@@ -176,6 +183,9 @@ export const Dashboard = () => {
                         right: 'dayGridMonth,dayGridWeek',
                     }}
                     events={backgroundEvents}
+                    dayMaxEvents={true} // Limit displayed events with "more" link
+                    eventColor="#4285f4" // Google Calendar primary color
+                    eventTextColor="white"
                 />
             </div>
 
@@ -186,6 +196,7 @@ export const Dashboard = () => {
                 aria-labelledby="modal-title"
             >
                 <Box
+                
                     sx={{
                         position: 'absolute',
                         top: '50%',
@@ -195,11 +206,15 @@ export const Dashboard = () => {
                         bgcolor: 'background.paper',
                         border: '2px solid #000',
                         boxShadow: 24,
+                        borderRadius: 4,
                         p: 4,
                     }}
                 >
                     <Typography id="modal-title" variant="h6" component="h2">
                         Workday Details
+                    </Typography>
+                    <Typography variant="body1" sx={{ mt: 2 }}>
+                        <strong>Date:</strong> {selectedDate}
                     </Typography>
                     {/* Display weekday name */}
                     <Typography variant="body1" sx={{ mt: 2 }}>
@@ -215,11 +230,46 @@ export const Dashboard = () => {
                     </Typography>
                     {/* Buttons */}
                     <Box display="flex" justifyContent="space-between" mt={4}>
+                        <Button onClick={handleConfirm} variant="contained" color="primary">
+                            Confirm
+                        </Button>
                         <Button onClick={handleCloseModal} variant="outlined" color="secondary">
                             Close
                         </Button>
-                        <Button onClick={handleConfirm} variant="contained" color="primary">
-                            Confirm
+                    </Box>
+                </Box>
+            </Modal>
+
+            {/* Confirm Delete Modal */}
+            <Modal
+                open={confirmDeleteModalOpen}
+                onClose={() => setConfirmDeleteModalOpen(false)}
+                aria-labelledby="confirm-delete-title"
+            >
+                <Box sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: 400,
+                    bgcolor: 'background.paper',
+                    border: '2px solid #000',
+                    boxShadow: 24,
+                    borderRadius: 4,
+                    p: 4,
+                }}>
+                    <Typography id="confirm-delete-title" variant="h6">
+                        Confirm Deletion
+                    </Typography>
+                    <Typography sx={{ mt: 2 }}>
+                        Are you sure you want to remove the workday for {selectedDate}?
+                    </Typography>
+                    <Box display="flex" justifyContent="space-between" mt={4}>
+                        <Button onClick={handleRemoveWorkday} variant="contained" color="error">
+                            Yes, Remove
+                        </Button>
+                        <Button onClick={() => setConfirmDeleteModalOpen(false)} variant="outlined" color="secondary">
+                            Cancel
                         </Button>
                     </Box>
                 </Box>
