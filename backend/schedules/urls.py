@@ -12,25 +12,25 @@ urlpatterns = [
     path('workdays/update/<int:pk>/', WorkdayUpdateView.as_view(), name='workday-update'),
     path('workdays/delete/<int:pk>/', WorkdayDeleteView.as_view(), name='workday-delete'),
 
-    path('weekdays/', WeekdayListView.as_view(), name='weekday-list'),  # Pass boolean future_only query param
+    path('weekdays/', WeekdayListView.as_view(), name='weekday-list'),  # Pass boolean "future_only" query param
     path('weekdays/create/', WeekdayCreateView.as_view(), name='weekday-create'),
     path('weekdays/<int:pk>/', WeekdayDetailView.as_view(), name='weekday-detail'),
     path('weekdays/update/<int:pk>/', WeekdayUpdateView.as_view(), name='weekday-update'),
     path('weekdays/delete/<int:pk>/', WeekdayDeleteView.as_view(), name='weekday-delete'),
 
-    path('availability/', AvailabilityListView.as_view(), name='availability-list'),  # Pass workday_id as query param
+    path('availability/', AvailabilityListView.as_view(), name='availability-list'),  # Pass "workday_id" or "all" as query param
     path('availability/create/', AvailabilityCreateView.as_view(), name='availability-create'),
     path('availability/<int:pk>/', AvailabilityDetailView.as_view(), name='availability-detail'),
     path('availability/update/<int:pk>/', AvailabilityUpdateView.as_view(), name='availability-update'),
     path('availability/delete/<int:pk>/', AvailabilityDeleteView.as_view(), name='availability-delete'),
 
-    path('shifts/', ShiftListView.as_view(), name='shift-list'),  # Pass workday_id as query param
+    path('shifts/', ShiftListView.as_view(), name='shift-list'),  # Pass "workday_id" or boolean "future_only" as query param
     path('shifts/create/', ShiftCreateView.as_view(), name='shift-create'),
     path('shifts/<int:pk>/', ShiftDetailView.as_view(), name='shift-detail'),
     path('shifts/update/<int:pk>/', ShiftUpdateView.as_view(), name='shift-update'),
     path('shifts/delete/<int:pk>/', ShiftDeleteView.as_view(), name='shift-delete'),
 
-    path('assignments/', ShiftAssignmentListView.as_view(), name='assignment-list'),  # Pass workday_id as query param
+    path('assignments/', ShiftAssignmentListView.as_view(), name='assignment-list'),  # Pass "workday_id" as query param
     path('assignments/create/', ShiftAssignmentCreateView.as_view(), name='assignment-create'),
     path('assignments/<int:pk>/', ShiftAssignmentDetailView.as_view(), name='assignment-detail'),
     path('assignments/update/<int:pk>/', ShiftAssignmentUpdateView.as_view(), name='assignment-update'),

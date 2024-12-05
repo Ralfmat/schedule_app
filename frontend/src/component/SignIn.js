@@ -38,6 +38,7 @@ export const SignIn = () => {
       
     } catch (error) {
       console.error("Logging error", error);
+      localStorage.clear();
       if (error.response && error.response.data) {
         setErrors(error.response.data);
       }

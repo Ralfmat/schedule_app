@@ -32,6 +32,7 @@ export const Account = () => {
             <p><strong>First Name:</strong> {account.first_name}</p>
             <p><strong>Last Name:</strong> {account.last_name}</p>
             <p><strong>Phone Number:</strong> {account.phone_number}</p>
+            <p><strong>Role:</strong> {account.role}</p>
         </div>
     );
 };

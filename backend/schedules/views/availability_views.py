@@ -28,16 +28,26 @@ class AvailabilityCreateView(CreateAPIView):
 
 class AvailabilityListView(ListAPIView):
     serializer_class = AvailabilitySerializer
-    permission_classes = (IsAuthenticated, )
+    # permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
-        # Get the workday ID from the query params and filter availability by it
+        # Get query parameters
         workday_id = self.request.query_params.get('workday_id')
+        all_availabilities = self.request.query_params.get('all', 'false').lower() == 'true'
         user = self.request.user
 
+        # If 'all' query param is true, return all availabilities, optionally filtered by workday
+        if all_availabilities:
+            queryset = Availability.objects.all()
+            if workday_id:
+                queryset = queryset.filter(workday_id=workday_id)
+            return queryset
+
+        # Otherwise, return availabilities for the logged-in user
+        queryset = Availability.objects.filter(account=user)
         if workday_id:
-            return Availability.objects.filter(workday_id=workday_id, account=user)
-        return Availability.objects.filter(account=user)
+            queryset = queryset.filter(workday_id=workday_id)
+        return queryset
 
 class AvailabilityUpdateView(UpdateAPIView):
     queryset = Availability.objects.all()

@@ -1,4 +1,7 @@
-import React from 'react';
+import PropTypes from 'prop-types';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Modal from '@mui/material/Modal';
 
 const ErrorMessage = ({ message }) => {
     return (

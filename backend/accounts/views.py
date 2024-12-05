@@ -4,6 +4,7 @@ from rest_framework.generics import RetrieveUpdateDestroyAPIView, CreateAPIView,
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.permissions import IsAuthenticated
 from accounts.models import Account
 from accounts.serializers import *
 
@@ -24,7 +25,7 @@ class AccountDetail(RetrieveUpdateDestroyAPIView):
         return Account.objects.filter(account=user)
     
 class AccountMeView(APIView):
-    # permission_class = (IsAuthenticated, )
+    permission_class = (IsAuthenticated, )
 
     def get(self, request):
         user = request.user

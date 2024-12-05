@@ -10,6 +10,7 @@ import { Employee } from './component/Employee';
 import { Manager } from './component/Manager';
 import { Calendar } from './component/Calendar';
 import { Dashboard } from './component/Dashboard';
+import { ProtectedManagerRoute } from "./utils/authUtils";
 
 function App() {
     return (
@@ -24,7 +25,12 @@ function App() {
           <Route path="/employee" element={<Employee/>}/>
           <Route path="/manager" element={<Manager/>}/>
           <Route path="/calendar" element={<Calendar/>}/>
-          <Route path="/dashboard" element={<Dashboard/>}/>
+          <Route path="/dashboard" 
+            element={
+            <ProtectedManagerRoute roleRequired="MANAGER">
+              <Dashboard />
+            </ProtectedManagerRoute>
+          }/>
         </Routes>
       </BrowserRouter>);
 }
