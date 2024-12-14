@@ -9,47 +9,23 @@ export const fetchCurrentAccount = async () => {
     }
 };
 
-export const fetchAvailability = async (workday_id) => {
+export const fetchAvailability = async (workday_id, all_users) => {
     try {
-        const endpoint = workday_id
-        ? `schedule/availability/?workday_id=${workday_id}` 
-        : "schedule/availability/";
+        let endpoint = "schedule/availability/";
 
-        const response = await fetchData(endpoint);
-        return response.data;
-    } catch (error) {
-        console.error("Error fetching availabilities:", error);
-    }
-};
-
-export const fetchShifts = async (workday_id, future_only) => {
-    try {
-        let endpoint = "schedule/shifts/";
-
-        // Build query parameters dynamically
         const params = new URLSearchParams();
         if (workday_id) params.append("workday_id", workday_id);
-        if (future_only) params.append("future_only", "true");
+        if (all_users) params.append("all_users", all_users);
 
-        // Append query string to the endpoint if parameters exist
         if (params.toString()) {
             endpoint += `?${params.toString()}`;
         }
-
+        
         const response = await fetchData(endpoint);
+        
         return response.data;
     } catch (error) {
-        console.error("Error fetching shifts:", error);
-    }
-};
-
-export const postShift = async (data) => {
-    try {
-        const request = await postData("schedule/shifts/create/", data);
-        return request.data;
-    } catch (error) {
-        console.error("Error posting shift:", error);
-        throw error;
+        console.error("Error fetching availabilities:", error);
     }
 };
 
@@ -66,12 +42,19 @@ export const fetchAssignments = async (workday_id) => {
     }
 };
 
-export const fetchWeekdays = async () => {
+export const fetchShifts = async (workday_id, future_only) => {
     try {
-        const response = await fetchData("schedule/weekdays/");
+        let endpoint = future_only
+        ? `schedule/shifts/?future_only=${future_only}`
+        : 'schedule/shifts/'
+
+        // Append query parameters only if they are defined
+        if (workday_id) endpoint+=`&workday_id=${workday_id}`
+
+        const response = await fetchData(endpoint);
         return response.data;
     } catch (error) {
-        console.error("Error fetching weekdyas:", error);
+        console.error("Error fetching shifts:", error);
     }
 };
 
@@ -81,11 +64,39 @@ export const fetchWorkdays = async (future_only) => {
     try {
         const endpoint = future_only
         ? `schedule/workdays/?future_only=${future_only}`
-        : `schedule/workdays/`;
+        : 'schedule/workdays/';
         const response = await fetchData(endpoint);
         return response.data;
     } catch (error) {
         console.error("Error fetching workdays:", error);
+    }
+};
+
+export const fetchWeekdays = async () => {
+    try {
+        const response = await fetchData("schedule/weekdays/");
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching weekdays:", error);
+    }
+};
+
+export const fetchAccounts = async () => {
+    try {
+        const response = await fetchData("auth/accounts");
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching employees:", error);
+    }
+};
+
+export const postShift = async (data) => {
+    try {
+        const request = await postData("schedule/shifts/create/", data);
+        return request.data;
+    } catch (error) {
+        console.error("Error posting shift:", error);
+        throw error;
     }
 };
 
@@ -103,6 +114,16 @@ export const deleteWorkday = async (workday_id) => {
         const request = await deleteData(`schedule/workdays/delete/${workday_id}`);
         return request.data;
     } catch (error) {
-        console.error("Error fetching weekdyas:", error);
+        console.error("Error deleting workday:", error);
     }
 }
+
+export const deleteShift = async (shift_id) => {
+    try {
+        const request = await deleteData(`schedule/shifts/delete/${shift_id}`);
+        return request.data;
+    } catch (error) {
+        console.error("Error deleting shift:", error);
+    }
+}
+

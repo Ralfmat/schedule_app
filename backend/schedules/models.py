@@ -48,6 +48,7 @@ class Availability(models.Model):
         db_table = 'availabilities'
         verbose_name = 'Availability'
         verbose_name_plural = 'Availabilities'
+        unique_together = ['account', 'workday']
 
     def __str__(self) -> str:
         return f"{self.account.username} - {self.workday.date} ({self.start_time}-{self.end_time})"

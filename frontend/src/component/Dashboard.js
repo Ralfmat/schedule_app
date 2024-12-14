@@ -3,20 +3,18 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import Modal from '@mui/material/Modal';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
-import MenuItem from '@mui/material/MenuItem';
+import { Grid2, Typography, Button, Box } from '@mui/material';
+
 import './Dashboard.css';
 
-import { fetchWeekdays, fetchWorkdays, postWorkday, deleteWorkday, fetchShifts, postShift } from '../utils/dataUtils';
+import { fetchWeekdays, fetchWorkdays, postWorkday, deleteWorkday, fetchShifts, postShift, fetchAvailability, deleteShift, fetchAccounts } from '../utils/dataUtils';
 
 export const Dashboard = () => {
     const [selectedDate, setSelectedDate] = useState(null);
     const [openModal, setOpenModal] = useState(false);
     const [confirmDeleteModalOpen, setConfirmDeleteModalOpen] = useState(false);
-    const [modalType, setModalType] = useState(''); // To track which modal to open
+    const [modalType, setModalType] = useState('');
     const [weekdays, setWeekdays] = useState([]);
     const [workdays, setWorkdays] = useState([]);
     const [shifts, setShifts] = useState([]);
@@ -29,26 +27,155 @@ export const Dashboard = () => {
         shift_end_time: '',
     });
     const [isWorkdaySelected, setIsWorkdaySelected] = useState(false);
+    const [selectedShift, setSelectedShift] = useState(null);
+    const [availabilities, setAvailabilities] = useState([]);
+    const [partAvailabilities, setPartAvailabilities] = useState([]);
+    const [assignedEmployees, setAssignedEmployees] = useState([]);
+    const [partAssignedEmployees, setPartAssignedEmployees] = useState([]);
+    const [employees, setEmployees] = useState([]);
+
 
     useEffect(() => {
         const loadWeekdays = async() => {
             const weekdays = await fetchWeekdays();
             setWeekdays(weekdays);
         };
-
         const loadWorkdays = async() => {
             const workdays = await fetchWorkdays(true);
             setWorkdays(workdays);
         }
         const loadShifts = async () => {
-            const shifts = await fetchShifts();
+            const shifts = await fetchShifts(undefined, true);
             setShifts(shifts);
         };
+        // const loadEmployees = async () => {
+        //     const accounts = await fetchAccounts();
+        //     const employees = accounts.filter((account) => {
+        //         return account.role === "EMPLOYEE";
+        //     });
+        //     setEmployees(employees);
+        // }
 
         loadWeekdays();
         loadWorkdays();
         loadShifts();
+        // loadEmployees();
     }, []);
+
+    useEffect(() => {
+        const loadEmployees = async () => {
+            const accounts = await fetchAccounts();
+            const employees = accounts.filter((account) => {
+                return account.role === "EMPLOYEE"; // Filter for employees
+            });
+    
+            // If selectedShift is available, filter employees based on its date
+            if (selectedShift) {
+                const selectedShiftDate = selectedShift.workday_date; // Get the date of the selected shift
+    
+                try {
+                    // Fetch availabilities for the selected shift's workday
+                    const availabilities = await fetchAvailability(selectedShift.workday_id, true);
+    
+                    // Filter employees who do not have availability on the selected shift date
+                    const employeesWithoutAvailability = employees.filter((employee) => {
+                        // Check if this employee has availability on the selected shift's date
+                        const employeeHasAvailability = availabilities.some((availability) => {
+                            return availability.account.id === employee.id && availability.workday.date === selectedShiftDate;
+                        });
+    
+                        // Return only employees who don't have availability on that date
+                        return !employeeHasAvailability;
+                    });
+    
+                    setEmployees(employeesWithoutAvailability);
+                } catch (error) {
+                    console.error("Error fetching availabilities:", error);
+                }
+            }
+        };
+    
+        loadEmployees();
+    }, [selectedShift]); // Dependency on selectedShift to reload when it changes
+
+    const isWithinShiftHours = (availStart, availEnd, shiftStartISO, shiftEndISO) => {
+        const toMinutes = (time) => {
+            const [hours, minutes] = time.split(':').map(Number);
+            return hours * 60 + minutes;
+        };
+    
+        // Extract time portion from ISO format
+        const extractTime = (isoTime) => {
+            return isoTime.split('T')[1].split('+')[0]; // Gets "HH:mm:ss" from "2024-12-07T12:00:00+01:00"
+        };
+    
+        const shiftStart = extractTime(shiftStartISO);
+        const shiftEnd = extractTime(shiftEndISO);
+    
+        return (
+            toMinutes(availStart) <= toMinutes(shiftStart) &&
+            toMinutes(availEnd) >= toMinutes(shiftEnd)
+        );
+    };
+
+    const isPartlyWithinShiftHours = (availStart, availEnd, shiftStartISO, shiftEndISO) => {
+        const toMinutes = (time) => {
+            const [hours, minutes] = time.split(':').map(Number);
+            return hours * 60 + minutes;
+        };
+    
+        // Extract time portion from ISO format
+        const extractTime = (isoTime) => {
+            return isoTime.split('T')[1].split('+')[0]; // Gets "HH:mm:ss" from "2024-12-07T12:00:00+01:00"
+        };
+    
+        const shiftStart = extractTime(shiftStartISO);
+        const shiftEnd = extractTime(shiftEndISO);
+    
+        return (
+            (toMinutes(availStart) < toMinutes(shiftEnd) && toMinutes(availStart) > toMinutes(shiftStart)) ||
+            (toMinutes(availEnd) < toMinutes(shiftEnd) && toMinutes(availEnd) > toMinutes(shiftStart))
+        );
+    };
+
+    useEffect(() => {
+        const loadAvailabilities = async () => {
+            if (selectedShift && selectedShift.workday_id) {
+                try {
+                    const response = await fetchAvailability(selectedShift.workday_id, true);
+                    setAvailabilities(
+                        response.filter((availability) =>
+                            isWithinShiftHours(
+                                availability.start_time,
+                                availability.end_time,
+                                selectedShift.start_time,
+                                selectedShift.end_time
+                            )
+                        )
+                    );
+                    setPartAvailabilities(
+                        response.filter((availability) =>
+                            isPartlyWithinShiftHours(
+                                availability.start_time,
+                                availability.end_time,
+                                selectedShift.start_time,
+                                selectedShift.end_time
+                            )
+                        )
+                    );
+                    
+                } catch (error) {
+                    console.error("Error fetching availabilities:", error);
+                }
+            }
+        };
+
+        loadAvailabilities();
+        setAssignedEmployees([]);
+        setAvailabilities([]);
+        setPartAssignedEmployees([]);
+        setPartAvailabilities([]);
+    }, [selectedShift]);
     
     const handleDateSelect = (selectionInfo) => {
         const { startStr } = selectionInfo;
@@ -78,11 +205,19 @@ export const Dashboard = () => {
     const handleOpenModal = (type) => {
         setModalType(type);
         setOpenModal(true);
+        setAssignedEmployees([]);
+        setAvailabilities([]);
+        setPartAssignedEmployees([]);
+        setPartAvailabilities([]);
     };
 
     const handleCloseModal = () => {
         setOpenModal(false);
         setModalType('');
+        setAssignedEmployees([]);
+        setAvailabilities([]);
+        setPartAssignedEmployees([]);
+        setPartAvailabilities([]);
     };
 
     const handleInputChange = (event) => {
@@ -91,6 +226,26 @@ export const Dashboard = () => {
             ...prevFormData,
             [name]: value,
         }));
+    };
+
+    const handleAssignEmployee = (availability) => {
+        setAssignedEmployees((prev) => [...prev, availability]);
+        setAvailabilities((prev) => prev.filter((avail) => avail.id !== availability.id));
+    };
+
+    const handlePartlyAssignEmployee = (availability) => {
+        setPartAssignedEmployees((prev) => [...prev, availability]);
+        setPartAvailabilities((prev) => prev.filter((avail) => avail.id !== availability.id));
+    };
+    
+    const handleUnassignEmployee = (employee) => {
+        setAssignedEmployees((prev) => prev.filter((assigned) => assigned.id !== employee.id));
+        setAvailabilities((prev) => [...prev, employee]);
+    };
+
+    const handlePartlyUnassignEmployee = (employee) => {
+        setPartAssignedEmployees((prev) => prev.filter((assigned) => assigned.id !== employee.id));
+        setPartAvailabilities((prev) => [...prev, employee]);
     };
 
     const handleWorkdayCreate = async () => {
@@ -122,26 +277,33 @@ export const Dashboard = () => {
 
     const handleShiftCreate = async () => {
         const selectedWorkday = workdays.find(day => day.date === formData.date);
-        const workdayId = selectedWorkday ? selectedWorkday.id : null;
+        const workday = selectedWorkday ? selectedWorkday : null;
 
-        if(!workdayId) {
-            console.error("Workday ID not found for:", formData.date);
+        if(!workday) {
+            console.error("Workday not found for:", formData.date);
             return;
         }
 
         const data = {
             start_time: formData.shift_start_time,
             end_time: formData.shift_end_time,
-            workday_id: workdayId
+            workday_id: workday.id
         };
 
         console.log("Submitting shift data:", data);
 
         try {
             await postShift(data); // Replace with your actual API call
-            const updatedShifts = await fetchShifts(); // Fetch updated shifts
+            const updatedShifts = await fetchShifts(undefined, true); // Fetch updated shifts
+            const newShift = updatedShifts.find(
+                updatedShift => !shifts.some(
+                    existingShift => existingShift.id === updatedShift.id
+                )
+            );
+            setSelectedShift(newShift);
             setShifts(updatedShifts); // Update shifts state
-            handleCloseModal(); // Close the modal after successful creation
+            // handleCloseModal(); // Close the modal after successful creation
+            handleOpenModal('modifyShift');
         } catch (error) {
             console.error("Error creating shift:", error);
         }
@@ -160,7 +322,7 @@ export const Dashboard = () => {
                 const updatedWorkdays = await fetchWorkdays(true);
                 setWorkdays(updatedWorkdays);
 
-                const updatedShifts = await fetchShifts(); // Fetch updated shifts
+                const updatedShifts = await fetchShifts(undefined, true); // Fetch updated shifts
                 setShifts(updatedShifts); // Update shifts state
 
                 // Reset selection
@@ -171,6 +333,19 @@ export const Dashboard = () => {
             console.error("Error removing workday:", error);
         } finally {
             setConfirmDeleteModalOpen(false);
+        }
+    };
+
+    const handleRemoveShift = async () => {
+        try {
+            await deleteShift(selectedShift.id);
+
+            const updatedShifts = await fetchShifts(undefined, true);
+            setShifts(updatedShifts);
+
+            handleCloseModal();
+        } catch (error) {
+            console.error("Error removing shift:", error);
         }
     };
 
@@ -197,6 +372,10 @@ export const Dashboard = () => {
                 title: `${formatTime(shift.start_time)} - ${formatTime(shift.end_time)}`,
                 start: `${shift.workday.date}T${shift.start_time}`,
                 end: `${shift.workday.date}T${shift.end_time}`,
+                extendedProps: {
+                    workday_id: shift.workday.id,
+                    workday_date: shift.workday.date
+                },
                 className: 'custom-shift-event',
             };
         });
@@ -204,7 +383,7 @@ export const Dashboard = () => {
     
     const workdayEvents = createWorkdayEvents(workdays);
     const shiftEvents = createShiftEvents(shifts);
-    
+
     return (
         <div className='dashboard-window'>
             <div className='dashboard-toolbar'>
@@ -257,12 +436,253 @@ export const Dashboard = () => {
                     )}
                     dayMaxEvents={true}
                     eventClick={(info) => {
-                        console.log("Clicked event:", info.event);
-                        // Open shift modal for modification
+                        const clickedShift = shifts.find(shift => `${shift.id}` === `${info.event.id}`);
+    
+                        if (clickedShift) {
+                            setSelectedShift(clickedShift);
+                        } else {
+                            console.error("Shift not found for ID:", info.event.id);
+                        }
+                        
                         handleOpenModal('modifyShift');
                     }}
                 />
             </div>
+            
+            {/* Edit Shift Modal */}
+            <Modal
+                open={openModal && modalType === 'modifyShift'}
+                onClose={handleCloseModal}
+                aria-labelledby="edit-shift-modal-title"
+            >
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '40%',
+                        overflowY: 'auto',
+                        maxHeight: '95vh',
+                        transform: 'translate(-35%, -50%)',
+                        bgcolor: 'background.paper',
+                        border: '2px solid #000',
+                        boxShadow: 24,
+                        borderRadius: 4,
+                        p: 4,
+                    }}
+                >
+                    <Typography id="edit-shift-modal-title" variant="h6" sx={{ mb: 2 }}>
+                        Assign Employees To The Shift
+                    </Typography>
+
+                    <Typography>
+                        <strong>Date:</strong> {selectedShift ? selectedShift.workday.date : ""} <br />
+                        <strong>Shift:</strong> {selectedShift ? selectedShift.start_time : ""} - {selectedShift ? selectedShift.end_time : ""}
+                    </Typography>
+
+                    {/* Grid layout for employees */}
+                    <Grid2 container spacing={3} sx={{ mt: 3 }}>
+                        {/* First Column: Available and Partly Available Employees */}
+                        <Grid2 item xs={6} sx={{ mb: 3 }}>
+                            <Box sx={{ display: 'flex', flexDirection: 'column', minWidth: '300px' }}>
+                                {/* Available Employees */}
+                                <Typography variant="subtitle1">Fully Available Employees</Typography>
+                                <Box
+                                    sx={{
+                                        minHeight: '130px',
+                                        maxHeight: '130px', // Fixed height for scrollable box
+                                        minWidth: '500px',
+                                        maxWidth: '500px',
+                                        overflowY: 'auto',  // Makes the list scrollable
+                                        border: '1px solid #ddd',
+                                        borderRadius: '4px',
+                                        p: 1,
+                                    }}
+                                >
+                                    <ul style={{ listStyleType: 'none', paddingLeft: 0 }}>
+                                        {availabilities.map((availability) => (
+                                            <li key={availability.id}>
+                                                {availability.account.username} ({availability.start_time} - {availability.end_time})
+                                                <Button
+                                                    variant="contained"
+                                                    size="small"
+                                                    color="primary"
+                                                    onClick={() => handleAssignEmployee(availability)}
+                                                    sx={{ ml: 2 }}
+                                                >
+                                                    +
+                                                </Button>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </Box>
+
+                                {/* Partly Available Employees */}
+                                <Typography variant="subtitle1" sx={{ mt: 2 }}>
+                                    Partly Available Employees
+                                </Typography>
+                                <Box
+                                    sx={{
+                                        minHeight: '150px',
+                                        maxHeight: '150px', // Fixed height for scrollable box
+                                        minWidth: '500px',
+                                        maxWidth: '500px',
+                                        overflowY: 'auto',  // Makes the list scrollable
+                                        border: '1px solid #ddd',
+                                        borderRadius: '4px',
+                                        p: 1,
+                                    }}
+                                >
+                                    <ul style={{ listStyleType: 'none', paddingLeft: 0 }}>
+                                        {partAvailabilities.map((availability) => (
+                                            <li key={availability.id}>
+                                                {availability.account.username} ({availability.start_time} - {availability.end_time})
+                                                <Button
+                                                    variant="contained"
+                                                    size="small"
+                                                    color="primary"
+                                                    onClick={() => handlePartlyAssignEmployee(availability)}
+                                                    sx={{ ml: 2 }}
+                                                >
+                                                    +
+                                                </Button>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </Box>
+                            </Box>
+                        </Grid2>
+
+                        {/* Second Column: All Employees (Not Just Available or Partly Available) */}
+                        <Grid2 item xs={6}>
+                            <Typography variant="subtitle1">
+                                Non available Employees
+                            </Typography>
+                            <Box sx={{ display: 'flex', flexDirection: 'column', minWidth: '300px' }}>
+                                <Box
+                                    sx={{
+                                        minHeight: '325px',
+                                        maxHeight: '325px', // Fixed height for scrollable box
+                                        minWidth: '500px',
+                                        maxWidth: '500px',
+                                        overflowY: 'auto',  // Makes the list scrollable
+                                        border: '1px solid #ddd',
+                                        borderRadius: '4px',
+                                        p: 1,
+                                    }}
+                                >
+                                    <ul style={{ listStyleType: 'none', paddingLeft: 0 }}>
+                                        {employees.map((employee) => (
+                                            <li key={employee.id}>
+                                                {employee.username} ({employee.role})
+                                                <Button
+                                                    variant="contained"
+                                                    size="small"
+                                                    color="primary"
+                                                    onClick={() => handleAssignEmployee(employee)}
+                                                    sx={{ ml: 2, mb: 1 }}
+                                                >
+                                                    +
+                                                </Button>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </Box>
+                            </Box>
+                        </Grid2>
+                    </Grid2>
+
+                    {/* Assigned Employees Section */}
+                    <Typography variant="subtitle1" sx={{ mt: 3 }}>
+                        Assigned Employees
+                    </Typography>
+                    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                        {/* Assigned Employees */}
+                        <Box
+                            sx={{
+                                minHeight: '150px',
+                                maxHeight: '150px', // Fixed height for scrollable box
+                                minWidth: '500px',
+                                maxWidth: '500px',
+                                overflowY: 'auto',  // Makes the list scrollable
+                                border: '1px solid #ddd',
+                                borderRadius: '4px',
+                                p: 1,
+                                mb: 1, // Margin-bottom to separate the two sections
+                            }}
+                        >
+                            <ul style={{ listStyleType: 'none', paddingLeft: 0 }}>
+                                {assignedEmployees.map((employee) => (
+                                    <li key={employee.id}>
+                                        {employee.account.username}
+                                        <Button
+                                            variant="outlined"
+                                            size="small"
+                                            color="secondary"
+                                            onClick={() => handleUnassignEmployee(employee)}
+                                            sx={{ ml: 2 }}
+                                        >
+                                            -
+                                        </Button>
+                                    </li>
+                                ))}
+                            </ul>
+
+                            <ul>
+                                {partAssignedEmployees.map((employee) => (
+                                    <li key={employee.id}>
+                                        {employee.account.username}
+                                        <Button
+                                            variant="outlined"
+                                            size="small"
+                                            color="secondary"
+                                            onClick={() => handlePartlyUnassignEmployee(employee)}
+                                            sx={{ ml: 2 }}
+                                        >
+                                            -
+                                        </Button>
+                                    </li>
+                                ))}
+                            </ul>
+                        </Box>
+                    </Box>
+
+                    {/* Action Buttons */}
+                    <Box display="flex" justifyContent="space-between" mt={4}>
+                        <Button
+                            onClick={async () => {
+                                try {
+                                    const assignments = assignedEmployees.map((employee) => ({
+                                        account_id: employee.account.id,
+                                        shift_id: selectedShift.id,
+                                    }));
+                                    // await postShiftAssignments(assignments); // Batch request
+                                    console.log("Assignments saved successfully!");
+                                    handleCloseModal();
+                                } catch (error) {
+                                    console.error("Error saving assignments:", error);
+                                }
+                            }}
+                            variant="contained"
+                            color="primary"
+                        >
+                            Confirm
+                        </Button>
+
+                        {/* Remove Shift Button */}
+                        <Button
+                            variant="outlined"
+                            color="error"
+                            onClick={handleRemoveShift}
+                        >
+                            Remove Shift
+                        </Button>
+
+                        <Button onClick={handleCloseModal} variant="outlined" color="secondary">
+                            Cancel
+                        </Button>
+                    </Box>
+                </Box>
+            </Modal>
             
             {/* Create Shift Modal */}
             <Modal
@@ -276,7 +696,7 @@ export const Dashboard = () => {
                         top: '50%',
                         left: '50%',
                         transform: 'translate(-50%, -50%)',
-                        width: 600, // Increased width
+                        width: 550, // Increased width
                         bgcolor: 'background.paper',
                         border: '2px solid #000',
                         boxShadow: 24,
@@ -308,7 +728,7 @@ export const Dashboard = () => {
                         margin="normal"
                         sx={{ mb: 2 }}
                         name="shift_start_time"
-                        value={formData.shift_start_time || "06:00:00"}
+                        value={formData.shift_start_time || ""}
                         onChange={handleInputChange}
                     />
                     <TextField
@@ -318,7 +738,7 @@ export const Dashboard = () => {
                         margin="normal"
                         sx={{ mb: 3 }}
                         name="shift_end_time"
-                        value={formData.shift_end_time || "12:00:00"}
+                        value={formData.shift_end_time || ""}
                         onChange={handleInputChange}
                     />
                     {/* Action Buttons */}

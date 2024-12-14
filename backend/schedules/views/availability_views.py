@@ -33,10 +33,10 @@ class AvailabilityListView(ListAPIView):
     def get_queryset(self):
         # Get query parameters
         workday_id = self.request.query_params.get('workday_id')
-        all_availabilities = self.request.query_params.get('all', 'false').lower() == 'true'
+        all_availabilities = self.request.query_params.get('all_users', 'false').lower() == 'true'
         user = self.request.user
 
-        # If 'all' query param is true, return all availabilities, optionally filtered by workday
+        # If 'all_users' query param is true, return all availabilities, optionally filtered by workday
         if all_availabilities:
             queryset = Availability.objects.all()
             if workday_id:
