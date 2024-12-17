@@ -118,7 +118,7 @@ class ShiftAssignmentSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = ShiftAssignment
-        fields = ['account', 'shift']
+        fields = ['id', 'account', 'shift']
 
 class ShiftAssignmentCreateSerializer(serializers.ModelSerializer):
     account_id = serializers.PrimaryKeyRelatedField(queryset=Account.objects.all(), source='account')
@@ -126,7 +126,7 @@ class ShiftAssignmentCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ShiftAssignment
-        fields = ['account_id', 'shift_id']
+        fields = ['id', 'account_id', 'shift_id']
 # ---
 
 # Shift Swap Request Serializer

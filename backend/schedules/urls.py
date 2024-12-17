@@ -30,7 +30,7 @@ urlpatterns = [
     path('shifts/update/<int:pk>/', ShiftUpdateView.as_view(), name='shift-update'),
     path('shifts/delete/<int:pk>/', ShiftDeleteView.as_view(), name='shift-delete'),
 
-    path('assignments/', ShiftAssignmentListView.as_view(), name='assignment-list'),  # Pass "workday_id" as query param
+    path('assignments/', ShiftAssignmentListView.as_view(), name='assignment-list'),  # Pass "workday_id" or "shift_id" as query param
     path('assignments/create/', ShiftAssignmentCreateView.as_view(), name='assignment-create'),
     path('assignments/<int:pk>/', ShiftAssignmentDetailView.as_view(), name='assignment-detail'),
     path('assignments/update/<int:pk>/', ShiftAssignmentUpdateView.as_view(), name='assignment-update'),

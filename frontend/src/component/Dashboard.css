@@ -1,90 +1,112 @@
 .dashboard-window {
-    margin-left: 10vw;
-    margin-right: 10vw;
+  margin-left: 10vw;
+  margin-right: 10vw;
 }
 
 .dashboard-toolbar {
-    margin-top: 3vh;
-    margin-bottom: 3vh;
-    text-align: center;
+  margin-top: 3vh;
+  margin-bottom: 3vh;
+  text-align: center;
 }
 
 .dashboard-calendar {
-    margin-left: 8vw;
-    margin-right: 8vw;
+  margin-left: 8vw;
+  margin-right: 8vw;
+}
+
+.assigned-row {
+  background-color: #e0e0e0; /* Light gray background */
+}
+
+.to-be-unassigned {
+  background-color: #e0e0e0; /* Light gray */
+  color: #333; /* Darker text for visibility */
+}
+
+.user-box {
+    height: 300px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow-y: "auto";
+    width: 25rem;
+}
+
+.assign-row {
+    display: flex;
+    justify-content: flex-start;
 }
 
 /* General Calendar Styles */
 .fc {
-    font-family: Arial, sans-serif;
-    font-size: 14px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    border-radius: 6px;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
 }
 
 /* Toolbar Buttons */
 .fc-toolbar .fc-button {
-    background-color: #4285f4;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 5px 10px;
-    margin: 0 5px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.2s ease-in-out;
+  background-color: #4285f4;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 5px 10px;
+  margin: 0 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.2s ease-in-out;
 }
 
 .fc-toolbar .fc-button:hover {
-    background-color: #3367d6;
+  background-color: #3367d6;
 }
 
 /* Calendar Title */
 .fc-toolbar-title {
-    font-size: 18px;
-    font-weight: bold;
-    color: #333;
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
 }
 
 .fc-header-toolbar {
-    margin: 20px;
+  margin: 20px;
 }
 
 /* Days Header */
 .fc-daygrid-day-top {
-    font-size: 12px;
-    font-weight: bold;
-    color: #555;
+  font-size: 12px;
+  font-weight: bold;
+  color: #555;
 }
 
 /* Background Events */
 .fc-daygrid-event.fc-event {
-    background-color: #4285f4;
-    border: none;
-    color: white;
-    border-radius: 4px;
-    padding: 2px 5px;
+  background-color: #4285f4;
+  border: none;
+  color: white;
+  border-radius: 4px;
+  padding: 2px 5px;
 }
 
 /* Today Highlight */
 .fc-day-today {
-    background-color: #f1f3f4 !important;
-    border: 1px solid #dadce0;
+  background-color: #f1f3f4 !important;
+  border: 1px solid #dadce0;
 }
 
 /* Selected Date (custom style if needed) */
 .fc-daygrid-day.fc-day-selected {
-    background-color: #e8f0fe;
-    border: 2px solid #4285f4;
+  background-color: #e8f0fe;
+  border: 2px solid #4285f4;
 }
 
 /* Event Backgrounds */
 .fc-event.fc-event-background {
-    background-color: rgba(66, 133, 244, 0.2) !important;
-    border: none !important;
+  background-color: rgba(66, 133, 244, 0.2) !important;
+  border: none !important;
 }
 
 .custom-shift-event {
-    cursor: pointer; 
+  cursor: pointer;
 }

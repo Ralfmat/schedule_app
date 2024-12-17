@@ -29,10 +29,10 @@ export const fetchAvailability = async (workday_id, all_users) => {
     }
 };
 
-export const fetchAssignments = async (workday_id) => {
+export const fetchAssignments = async (shift_id) => {
     try {
-        const endpoint = workday_id
-        ? `schedule/assignments/?workday_id=${workday_id}` 
+        const endpoint = shift_id
+        ? `schedule/assignments/?shift_id=${shift_id}` 
         : "schedule/assignments/";
 
         const response = await fetchData(endpoint);
@@ -109,9 +109,18 @@ export const postWorkday = async (data) => {
     }
 };
 
+export const postAssignment = async (data) => {
+    try {
+        const request = await postData("schedule/assignments/create/", data);
+        return request.data;
+    } catch (error) {
+        console.error("Error posting assignment:", error);
+    }
+};
+
 export const deleteWorkday = async (workday_id) => {
     try {
-        const request = await deleteData(`schedule/workdays/delete/${workday_id}`);
+        const request = await deleteData(`schedule/workdays/delete/${workday_id}/`);
         return request.data;
     } catch (error) {
         console.error("Error deleting workday:", error);
@@ -120,10 +129,18 @@ export const deleteWorkday = async (workday_id) => {
 
 export const deleteShift = async (shift_id) => {
     try {
-        const request = await deleteData(`schedule/shifts/delete/${shift_id}`);
+        const request = await deleteData(`schedule/shifts/delete/${shift_id}/`);
         return request.data;
     } catch (error) {
         console.error("Error deleting shift:", error);
     }
 }
 
+export const deleteAssignment = async (assignment_id) => {
+    try {
+        const request = await deleteData(`schedule/assignments/delete/${assignment_id}/`);
+        return request.data;
+    } catch (error) {
+        console.error("Error deleting assignment:", error);
+    }
+}

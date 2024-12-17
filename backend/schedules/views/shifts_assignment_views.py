@@ -15,18 +15,23 @@ class ShiftAssignmentListView(ListAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        workday_id = self.request.query_params.get('workday_id')
+        workday_id = self.request.query_params.get('workday_id')  # Query parameter to filter by workday ID
+        shift_id = self.request.query_params.get('shift_id')  # Query parameter to filter by shift ID
 
-        # Managers can see all assignments, while employees can see only their own
+        # Managers can see all assignments, employees can only see their own assignments
         if user.role == 'MANAGER':
             queryset = ShiftAssignment.objects.all()
         else:
             queryset = ShiftAssignment.objects.filter(account=user)
 
-        # Filter by workday_id if provided
+        # Apply workday_id filter if provided
         if workday_id:
             queryset = queryset.filter(shift__workday_id=workday_id)
-        
+
+        # Apply shift_id filter if provided
+        if shift_id:
+            queryset = queryset.filter(shift_id=shift_id)
+
         return queryset
 
 class ShiftAssignmentDetailView(RetrieveAPIView):
