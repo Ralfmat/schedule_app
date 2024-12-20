@@ -28,6 +28,7 @@ class Weekday(models.Model):
 class Workday(models.Model):
     date = models.DateField(unique=True)
     week_day = models.ForeignKey(Weekday, on_delete=models.CASCADE)
+    is_enrolment_open = models.BooleanField(default=True)
 
     class Meta:
         db_table = 'workday'

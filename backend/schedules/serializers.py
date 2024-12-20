@@ -28,7 +28,7 @@ class WorkdayDetailSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Workday
-        fields = ('id', 'date', 'week_day')
+        fields = ('id', 'date', 'week_day', 'is_enrolment_open')
 
 class WorkdayCreateUpdateSerializer(serializers.ModelSerializer):
     # Use PrimaryKeyRelatedField to refer to an existing Weekday by its ID for POST/PUT/PATCH
@@ -58,24 +58,27 @@ class AvailabilityCreateSerializer(serializers.ModelSerializer):
         fields = ('account_id', 'start_time', 'end_time', 'workday_id')
 
     def validate(self, data):
+        errors = {}
+
         # Check if start time is before end time
         if data['start_time'] >= data['end_time']:
-            raise serializers.ValidationError("End time must be after start time.")
+            errors['start_time'] = "End time must be after start time."
 
-        # Retrieve the associated workday using the workday_id from the data
-        workday = Workday.objects.get(id=data['workday_id'])
+        # Retrieve the associated workday using the mapped 'workday' field
+        workday = data['workday']
         weekday = workday.week_day
 
-        # Ensure start time is after open time and end time is before close time
+        # Ensure start time is after open time
         if data['start_time'] < weekday.open_at:
-            raise serializers.ValidationError(
-                f"Start time must be after the opening time: {weekday.open_at}."
-            )
+            errors['start_time'] = f"Start time must be after the opening time: {weekday.open_at}."
 
+        # Ensure end time is before close time
         if data['end_time'] > weekday.close_at:
-            raise serializers.ValidationError(
-                f"End time must be before the closing time: {weekday.close_at}."
-            )
+            errors['end_time'] = f"End time must be before the closing time: {weekday.close_at}."
+
+        # If there are any errors, raise ValidationError with the unified key
+        if errors:
+            raise serializers.ValidationError({"error_messages": errors})
 
         return data
 # ---
@@ -98,6 +101,7 @@ class ShiftCreateSerializer(serializers.ModelSerializer):
     def validate(self, data):
         # Check if start time is before end time
         if data['start_time'] >= data['end_time']:
+            #TODO - raise errors the way it's done in AvailabilityCreateSerializer
             raise serializers.ValidationError("End time must be after start time.")
         
         # Retrieve the associated workday to validate open hours

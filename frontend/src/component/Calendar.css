@@ -1,8 +1,136 @@
-.calendar-group {
-    margin-right: 10vw;
-    margin-left: 10vw;
+.employee-dashboard-window {
+    margin-left: 4vw;
+    margin-right: 4vw;
+    margin-top: 2vw;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
 }
 
-.calendar-window {
-    height: 80vh;
+.employee-dashboard-toolbar {
+    align-self: center;
+    width: 45vw;
+    display: flex;
+    flex-direction: column;
+}
+
+.toolbar-buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 70%;
+    margin-bottom: 1rem;
+}
+
+.employee-dashboard-toolbar > h1 {
+    text-align: center;
+}
+
+.employee-dashboard-calendar {
+    /* position: fixed;
+    top: 13vw;
+    left: 4rem; */
+    width: 30vw;
+    height: fit-content;
+    
+}
+
+.main-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    margin-top: 2rem;
+}
+
+.left-container {
+    width: 30vw;
+}
+
+.right-container {
+    width: 30vw;
+}
+
+.selected-workday {
+    border: 2px solid #000000 !important; 
+    border-radius:4px;
+  }
+
+.custom-availability-event {
+    cursor: pointer;
+  }
+
+.fc-col-header-cell-cushion {
+    text-decoration: none;
+}
+
+/* Today Highlight */
+.fc-day-today {
+  background-color: #f1f3f4 !important;
+  border: 1px solid #dadce0;
+}
+
+/* Selected Date (custom style if needed) */
+.fc-daygrid-day.fc-day-selected {
+  background-color: #e8f0fe;
+  border: 2px solid #4285f4;
+}
+
+
+
+/* Event Backgrounds */
+.fc-event.fc-event-background {
+  background-color: rgba(66, 133, 244, 0.2) !important;
+  border: none !important;
+}
+
+.custom-shift-event {
+  cursor: pointer;
+}
+
+/* Center the day numbers */
+.fc-daygrid-day-number {
+  text-align: center; /* Centers the number horizontally */
+  justify-content: center; /* Aligns in flexbox context */
+  display: flex; /* Allows justification */
+  align-items: center; /* Centers vertically */
+  text-decoration: none; /* Removes underline */
+}
+
+/* Optional: Add some padding or margin if needed */
+.fc-daygrid-day {
+  padding: 5px;
+}
+
+.fc-daygrid-day-top {
+  justify-content: center;
+}
+
+.fc-daygrid-dot-event {
+    justify-content: center;
+}
+
+/* Modal Styles */
+.modal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background-color: white;
+  border: 2px solid #000;
+  box-shadow: 24px;
+  padding: 16px;
+  width: 400px;
+  max-width: 80%;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 16px;
+}
+
+.modal-button {
+  margin: 0 8px;
 }

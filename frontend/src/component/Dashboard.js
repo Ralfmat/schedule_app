@@ -570,7 +570,7 @@ export const Dashboard = () => {
           Create Shift
         </Button>
         <FormControlLabel
-          sx={{pl: "27vw"}}
+          sx={{ml: "27vw"}}
           control={
             <Switch
               checked={!futureOnly}
@@ -667,7 +667,7 @@ export const Dashboard = () => {
                 <Typography variant="subtitle1" sx={{ mb: 2 }}>
                   Fully Available Employees
                 </Typography>
-                <Box className="user-box">
+                <Box className="user-box" sx={{overflowY: "auto"}}>
                   <Table stickyHeader>
                     <TableHead>
                       <TableRow>
@@ -707,7 +707,7 @@ export const Dashboard = () => {
                 <Typography variant="subtitle1" sx={{ mb: 2 }}>
                   Partly Available Employees
                 </Typography>
-                <Box className="user-box">
+                <Box className="user-box" sx={{overflowY: "auto"}}>
                   <Table stickyHeader>
                     <TableHead>
                       <TableRow>
@@ -747,7 +747,7 @@ export const Dashboard = () => {
                 <Typography variant="subtitle1" sx={{ mb: 2 }}>
                   Unavailable Employees
                 </Typography>
-                <Box className="user-box">
+                <Box className="user-box" sx={{overflowY: "auto"}}>
                   <Table stickyHeader>
                     <TableHead>
                       <TableRow>
@@ -755,7 +755,7 @@ export const Dashboard = () => {
                         <TableCell>Action</TableCell>
                       </TableRow>
                     </TableHead>
-                    <TableBody>
+                    <TableBody >
                       {unavailableEmployees
                         .filter((employee) => employee.role === "EMPLOYEE")
                         .map((employee) => (
@@ -786,7 +786,7 @@ export const Dashboard = () => {
                 <Typography variant="subtitle1" sx={{ mb: 2 }}>
                   Employees To Be Assigned
                 </Typography>
-                <Box className="user-box">
+                <Box className="user-box" sx={{overflowY: "auto"}}>
                   <Table stickyHeader>
                     <TableHead>
                       <TableRow>
@@ -828,7 +828,7 @@ export const Dashboard = () => {
                 <Typography variant="subtitle1" sx={{ mb: 2 }}>
                   Assigned Employees
                 </Typography>
-                <Box className="user-box">
+                <Box className="user-box" sx={{overflowY: "auto"}}>
                   <Table stickyHeader>
                     <TableHead>
                       <TableRow>
@@ -898,7 +898,7 @@ export const Dashboard = () => {
                 <Typography variant="subtitle1" sx={{ mb: 2 }}>
                   Fully Available Managers
                 </Typography>
-                <Box className="user-box">
+                <Box className="user-box" sx={{overflowY: "auto"}}>
                   <Table stickyHeader>
                     <TableHead>
                       <TableRow>
@@ -934,7 +934,7 @@ export const Dashboard = () => {
                 <Typography variant="subtitle1" sx={{ mb: 2 }}>
                   Partly Available Managers
                 </Typography>
-                <Box className="user-box">
+                <Box className="user-box" sx={{overflowY: "auto"}}>
                   <Table stickyHeader>
                     <TableHead>
                       <TableRow>
@@ -970,7 +970,7 @@ export const Dashboard = () => {
                 <Typography variant="subtitle1" sx={{ mb: 2 }}>
                   Unavailable Managers
                 </Typography>
-                <Box className="user-box">
+                <Box className="user-box" sx={{overflowY: "auto"}}>
                   <Table stickyHeader>
                     <TableHead>
                       <TableRow>
@@ -1007,7 +1007,7 @@ export const Dashboard = () => {
               <Typography variant="subtitle1" sx={{ mb: 2 }}>
                 Managers To Be Assigned
               </Typography>
-              <Box className="user-box">
+              <Box className="user-box" sx={{overflowY: "auto"}}>
                 <Table stickyHeader>
                   <TableHead>
                     <TableRow>
@@ -1047,7 +1047,7 @@ export const Dashboard = () => {
               <Typography variant="subtitle1" sx={{ mb: 2 }}>
                 Assigned Managers
               </Typography>
-              <Box className="user-box">
+              <Box className="user-box" sx={{overflowY: "auto"}}>
                 <Table stickyHeader>
                   <TableHead>
                     <TableRow>

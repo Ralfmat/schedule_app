@@ -21,8 +21,12 @@ export const isPartlyWithinShiftHours = (availStart, availEnd, shiftStart, shift
 
 export const formatTime = (time) => {
   // Extract hours and minutes from '12:00:00'
-  const [hours, minutes] = time.split(":");
-  return `${hours}:${minutes}`;
+  try {
+    const [hours, minutes] = time.split(":");
+    return `${hours}:${minutes}`;
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 export const formatDate = (date) => {

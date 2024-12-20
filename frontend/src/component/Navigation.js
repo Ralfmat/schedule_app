@@ -3,6 +3,8 @@ import Navbar from "react-bootstrap/Navbar";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
+import "./Navigation.css";
+
 export function Navigation() {
   const [isAuth, setIsAuth] = useState(false);
 
@@ -10,15 +12,17 @@ export function Navigation() {
     if (localStorage.getItem("access_token") !== null) {
       (async () => {
         try {
-          const { data } = await axios.get("http://127.0.0.1:8000/auth/account/me", {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-          },
-          });
+          const { data } = await axios.get(
+            "http://127.0.0.1:8000/auth/account/me",
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+              },
+            }
+          );
           localStorage.setItem("user_role", data.role);
           setIsAuth(true);
-          
         } catch (e) {
           setIsAuth(false);
           if (e.response.status === 401) {
@@ -35,12 +39,14 @@ export function Navigation() {
 
   return (
     <div>
-      <Navbar bg="dark" variant="dark">
+      <Navbar bg="dark" variant="dark" className="navbar-fixed">
         <Navbar.Brand href="/">Schedule App</Navbar.Brand>
         <Nav className="me-auto">
           {isAuth ? <Nav.Link href="/">Home</Nav.Link> : null}
           {isAuth ? <Nav.Link href="/calendar">Calendar</Nav.Link> : null}
-          {isAuth && localStorage.getItem("user_role") === "MANAGER" ? <Nav.Link href="/dashboard">Dashboard</Nav.Link> : null}
+          {isAuth && localStorage.getItem("user_role") === "MANAGER" ? (
+            <Nav.Link href="/dashboard">Dashboard</Nav.Link>
+          ) : null}
         </Nav>
         <Nav>
           {isAuth ? <Nav.Link href="/account">Account</Nav.Link> : null}

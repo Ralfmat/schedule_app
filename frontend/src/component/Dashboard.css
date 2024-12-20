@@ -110,3 +110,21 @@
 .custom-shift-event {
   cursor: pointer;
 }
+
+/* Center the day numbers */
+.fc-daygrid-day-number {
+  text-align: center; /* Centers the number horizontally */
+  justify-content: center; /* Aligns in flexbox context */
+  display: flex; /* Allows justification */
+  align-items: center; /* Centers vertically */
+  text-decoration: none; /* Removes underline */
+}
+
+/* Optional: Add some padding or margin if needed */
+.fc-daygrid-day {
+  padding: 5px;
+}
+
+.fc-daygrid-day-top {
+  justify-content: center;
+}

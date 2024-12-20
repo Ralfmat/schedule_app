@@ -109,6 +109,15 @@ export const postWorkday = async (data) => {
     }
 };
 
+export const postAvailability = async (data) => {
+    try {
+        const request = await postData("schedule/availability/create/", data);
+        return request.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
 export const postAssignment = async (data) => {
     try {
         const request = await postData("schedule/assignments/create/", data);
@@ -142,5 +151,14 @@ export const deleteAssignment = async (assignment_id) => {
         return request.data;
     } catch (error) {
         console.error("Error deleting assignment:", error);
+    }
+}
+
+export const deleteAvailability = async (availability_id) => {
+    try {
+        const request = await deleteData(`schedule/availability/delete/${availability_id}/`);
+        return request.data;
+    } catch (error) {
+        console.error("Error deleting availability:", error);
     }
 }

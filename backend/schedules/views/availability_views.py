@@ -37,7 +37,7 @@ class AvailabilityListView(ListAPIView):
         user = self.request.user
 
         # If 'all_users' query param is true, return all availabilities, optionally filtered by workday
-        if all_availabilities:
+        if all_availabilities and user.role == "MANAGER":
             queryset = Availability.objects.all()
             if workday_id:
                 queryset = queryset.filter(workday_id=workday_id)
