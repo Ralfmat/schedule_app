@@ -7,7 +7,7 @@ from django.utils import timezone
 
 class ShiftListView(ListAPIView):
     serializer_class = ShiftSerializer
-    # permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated, )
 
     def get_queryset(self):
         today = timezone.now().date()
@@ -28,7 +28,7 @@ class ShiftListView(ListAPIView):
 class ShiftCreateView(CreateAPIView):
     queryset = Shift.objects.all()
     serializer_class = ShiftCreateSerializer
-    # permission_classes = (IsAuthenticated, IsManager)
+    permission_classes = (IsAuthenticated, IsManager)
 
     def perform_create(self, serializer):
         # Save shift for a specific workday
@@ -37,12 +37,12 @@ class ShiftCreateView(CreateAPIView):
 class ShiftDetailView(RetrieveAPIView):
     queryset = Shift.objects.all()
     serializer_class = ShiftSerializer
-    # permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated, )
 
 class ShiftUpdateView(UpdateAPIView):
     queryset = Shift.objects.all()
     serializer_class = ShiftCreateSerializer
-    # permission_classes = (IsAuthenticated, IsManager)
+    permission_classes = (IsAuthenticated, IsManager)
 
     def perform_update(self, serializer):
         # Update shift with manager access only
@@ -53,7 +53,7 @@ class ShiftUpdateView(UpdateAPIView):
 
 class ShiftDeleteView(DestroyAPIView):
     queryset = Shift.objects.all()
-    # permission_classes = (IsAuthenticated, IsManager)
+    permission_classes = (IsAuthenticated, IsManager)
     
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()

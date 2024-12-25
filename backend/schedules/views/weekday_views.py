@@ -6,22 +6,22 @@ from schedules.models import *
 from schedules.serializers import *
 
 class WeekdayDetailView(RetrieveAPIView):
-    # permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated, )
     queryset = Weekday.objects.all()
     serializer_class = WeekdayDetailSerializer
 
 class WeekdayListView(ListAPIView):
-    # permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated, )
     queryset = Weekday.objects.all()
     serializer_class = WeekdayDetailSerializer
 
 class WeekdayCreateView(CreateAPIView):
-    # permission_class = (IsAuthenticated, IsManager)
+    permission_class = (IsAuthenticated, IsManager)
     queryset = Weekday.objects.all()
     serializer_class = WeekdayCreateUpdateSerializer
 
 class WeekdayUpdateView(UpdateAPIView):
-    # permission_class = (IsAuthenticated, IsManager)
+    permission_class = (IsAuthenticated, IsManager)
     queryset = Weekday.objects.all()
     serializer_class = WeekdayCreateUpdateSerializer
 
@@ -29,5 +29,5 @@ class WeekdayUpdateView(UpdateAPIView):
         return self.partial_update(request, *args, **kwargs)
 
 class WeekdayDeleteView(DestroyAPIView):
-    # permission_class = (IsAuthenticated, IsManager)
+    permission_class = (IsAuthenticated, IsManager)
     queryset = Weekday.objects.all()

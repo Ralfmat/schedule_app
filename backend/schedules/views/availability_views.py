@@ -10,7 +10,7 @@ from django.utils import timezone
 class AvailabilityDetailView(RetrieveAPIView):
     queryset = Availability.objects.all()
     serializer_class = AvailabilitySerializer
-    # permission_classes = (IsAuthenticated, IsManager) # Ensure only authenticated users can access
+    permission_classes = (IsAuthenticated, IsManager) # Ensure only authenticated users can access
 
     def get_queryset(self):
         # If you want to restrict access to only the owner or managers
@@ -22,7 +22,7 @@ class AvailabilityDetailView(RetrieveAPIView):
 class AvailabilityCreateView(CreateAPIView):
     queryset = Availability.objects.all()
     serializer_class = AvailabilityCreateSerializer
-    # permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated, )
 
     def perform_create(self, serializer):
         # Link the availability to the authenticated user
@@ -30,7 +30,7 @@ class AvailabilityCreateView(CreateAPIView):
 
 class AvailabilityListView(ListAPIView):
     serializer_class = AvailabilitySerializer
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         # Get query parameters
@@ -54,7 +54,7 @@ class AvailabilityListView(ListAPIView):
 class AvailabilityUpdateView(UpdateAPIView):
     queryset = Availability.objects.all()
     serializer_class = AvailabilityCreateSerializer
-    # permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated, )
 
     def get_queryset(self):
         # Restrict updates to the logged-in user's availability entries
@@ -65,7 +65,7 @@ class AvailabilityUpdateView(UpdateAPIView):
     
 class AvailabilityDeleteView(DestroyAPIView):
     queryset = Availability.objects.all()
-    # permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated, )
 
     def get_queryset(self):
         # Restrict deletion to the logged-in user's availability entries

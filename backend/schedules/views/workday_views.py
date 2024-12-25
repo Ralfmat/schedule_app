@@ -9,12 +9,12 @@ from schedules.models import Workday
 from schedules.serializers import WorkdayCreateUpdateSerializer, WorkdayDetailSerializer
 
 class WorkdayDetailView(RetrieveAPIView):
-    # permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated, )
     queryset = Workday.objects.all()
     serializer_class = WorkdayDetailSerializer
 
 class WorkdayListView(ListAPIView):
-    # permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated, )
     serializer_class = WorkdayDetailSerializer
 
     def get_queryset(self):
@@ -29,12 +29,12 @@ class WorkdayListView(ListAPIView):
         return queryset
 
 class WorkdayCreateView(CreateAPIView):
-    # permission_class = (IsAuthenticated, IsManager)
+    permission_class = (IsAuthenticated, IsManager)
     queryset = Workday.objects.all()
     serializer_class = WorkdayCreateUpdateSerializer
 
 class WorkdayUpdateView(UpdateAPIView):
-    # permission_class = (IsAuthenticated, IsManager)
+    permission_class = (IsAuthenticated, IsManager)
     queryset = Workday.objects.all()
     serializer_class = WorkdayCreateUpdateSerializer
 
@@ -42,7 +42,7 @@ class WorkdayUpdateView(UpdateAPIView):
         return self.partial_update(request, *args, **kwargs)
 
 class WorkdayDeleteView(DestroyAPIView):
-    # permission_classes = (IsAuthenticated, IsManager)
+    permission_classes = (IsAuthenticated, IsManager)
     queryset = Workday.objects.all()
 
     def destroy(self, request, *args, **kwargs):
