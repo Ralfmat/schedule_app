@@ -1,0 +1,17 @@
+.custom-assignment-event {
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 5px;
+  margin: 5px;
+  cursor: pointer;
+}
+
+.assign-containers {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.right-container {
+  width: 40vw;
+}

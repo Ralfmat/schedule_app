@@ -1,12 +1,25 @@
 .dashboard-window {
   margin-left: 10vw;
   margin-right: 10vw;
+  margin-top: 2vw;
+}
+
+.dashboard-window h1 {
+  text-align: center;
 }
 
 .dashboard-toolbar {
   margin-top: 3vh;
   margin-bottom: 3vh;
+  margin-left: 8vw;
+  margin-right: 8vw;
   text-align: center;
+  display: flex;
+  flex-direction: row;
+}
+
+.toolbar-right{
+  margin-left: auto;
 }
 
 .dashboard-calendar {

@@ -4,10 +4,22 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import Modal from "@mui/material/Modal";
 import TextField from "@mui/material/TextField";
-import { Grid2, Typography, Button, Box, Table, TableHead, TableBody, TableRow, TableCell, FormControlLabel, Switch } from "@mui/material";
+import {
+  Grid2,
+  Typography,
+  Button,
+  Box,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  FormControlLabel,
+  Switch,
+} from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
-import "./Dashboard.css";
+import "./ManagerDashboard.css";
 
 import {
   fetchWeekdays,
@@ -22,11 +34,12 @@ import {
   fetchAssignments,
   postAssignment,
   deleteAssignment,
+  updateWorkday,
 } from "../utils/dataUtils";
 
 import { isWithinShiftHours, isPartlyWithinShiftHours, formatDate, formatTime } from "../utils/funcUtils";
 
-export const Dashboard = () => {
+export const ManagerDashboard = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [openModal, setOpenModal] = useState(false);
   const [confirmDeleteModalOpen, setConfirmDeleteModalOpen] = useState(false);
@@ -62,6 +75,8 @@ export const Dashboard = () => {
   const [managersToBeAssigned, setManagersToBeAssigned] = useState([]);
   const [managersToBeUnassigned, setManagersToBeUnassigned] = useState([]);
 
+  const [isEnrolmentOpen, setIsEnrolmentOpen] = useState(false);
+
   useEffect(() => {
     const loadWeekdays = async () => {
       const weekdays = await fetchWeekdays();
@@ -87,7 +102,7 @@ export const Dashboard = () => {
 
       if (selectedShift) {
         try {
-          const shiftAssignments = await fetchAssignments(selectedShift.id);
+          const shiftAssignments = await fetchAssignments(selectedShift.id, true);
 
           // Split employees and managers
           const employees = accounts.filter((account) => account.role === "EMPLOYEE");
@@ -111,7 +126,7 @@ export const Dashboard = () => {
           setAssignedManagers(assignedManagers);
 
           // Fetch availability for the shift
-          const response = await fetchAvailability(selectedShift.workday.id, true);
+          const response = await fetchAvailability(selectedShift.workday.id, true, true);
 
           // Process Employees
           const fullyAvailableEmployees = response
@@ -153,7 +168,7 @@ export const Dashboard = () => {
               !assignedEmployees.some((assigned) => assigned.id === employee.id)
           );
 
-          // Process Managers (use same logic)
+          // Process Managers
           const fullyAvailableManagers = response
             .filter((availability) =>
               isWithinShiftHours(
@@ -223,6 +238,10 @@ export const Dashboard = () => {
 
     // Check if there's a workday for the selected date
     const workday = workdays.find((workday) => workday.date === startStr);
+    if (workday) {
+      setIsEnrolmentOpen(workday.is_enrolment_open);
+      console.log(isEnrolmentOpen);
+    }
     const isWorkday = !!workday; // Boolean to check if workday exists
     setIsWorkdaySelected(isWorkday);
 
@@ -281,6 +300,33 @@ export const Dashboard = () => {
   const toggleFutureOnly = () => {
     setFutureOnly((prev) => !prev);
     // loadWorkdaysAndShifts(); // Refresh workdays and shifts
+  };
+
+  const toggleEnrolmentOpen = async () => {
+    if (isWorkdaySelected) {
+      const today = new Date().toISOString().split("T")[0];
+      const workday = workdays.find((workday) => workday.date === selectedDate);
+      if (workday && selectedDate >= today) {
+        try {
+          const weekDay = weekdays.find((day) => day.day_name === formData.week_day);
+          const data = { date: selectedDate, week_day: weekDay.id, is_enrolment_open: !workday.is_enrolment_open };
+          await updateWorkday(workday.id, data);
+          setWorkdays((prevWorkdays) => {
+            return prevWorkdays.map((wd) => {
+              if (wd.id === workday.id) {
+                return { ...wd, is_enrolment_open: !wd.is_enrolment_open };
+              }
+              return wd;
+            });
+          });
+          setIsEnrolmentOpen(!workday.is_enrolment_open);
+        } catch (error) {
+          console.error("Error updating workday enrollment status:", error);
+        }
+      } else {
+        console.warn("Enrolment can only be toggled for today or future workdays.");
+      }
+    }
   };
 
   const handleWorkdayCreate = async () => {
@@ -384,7 +430,7 @@ export const Dashboard = () => {
       start: workday.date,
       end: workday.date,
       display: "background",
-      color: "#ff9999",
+      color: workday.is_enrolment_open ? "#00ff00" : "#ff0000",
     }));
   };
 
@@ -493,10 +539,16 @@ export const Dashboard = () => {
     try {
       // Process "to be assigned" group
       for (const employee of employeesToBeAssigned) {
-        await postAssignment({ account_id: employee.id, shift_id: selectedShift.id });
+        await postAssignment({
+          account_id: employee.id,
+          shift_id: selectedShift.id,
+        });
       }
       for (const manager of managersToBeAssigned) {
-        await postAssignment({ account_id: manager.id, shift_id: selectedShift.id });
+        await postAssignment({
+          account_id: manager.id,
+          shift_id: selectedShift.id,
+        });
       }
 
       // Process "to be unassigned" group
@@ -513,7 +565,7 @@ export const Dashboard = () => {
       }
 
       // Refresh the assignments after confirmation
-      const updatedAssignments = await fetchAssignments(selectedShift.id);
+      const updatedAssignments = await fetchAssignments(selectedShift.id, true);
 
       setAssignedEmployees(
         updatedAssignments
@@ -542,44 +594,44 @@ export const Dashboard = () => {
   return (
     <div className="dashboard-window">
       <div className="dashboard-toolbar">
-        <h1>Dashboard Toolbar</h1>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => handleOpenModal("createWorkday")}
-          disabled={isWorkdaySelected}
-        >
-          Create Workday
-        </Button>
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={() => setConfirmDeleteModalOpen(true)}
-          disabled={!isWorkdaySelected} // Disable unless a workday is selected
-          sx={{ ml: 2 }}
-        >
-          Remove Workday
-        </Button>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => handleOpenModal("createShift")}
-          disabled={!isWorkdaySelected} // Enable only if a workday is selected
-          sx={{ ml: 2 }}
-        >
-          Create Shift
-        </Button>
-        <FormControlLabel
-          sx={{ml: "27vw"}}
-          control={
-            <Switch
-              checked={!futureOnly}
-              onChange={toggleFutureOnly}
-              color="primary"
-            />
-          }
-          label={futureOnly ? "Past Workload" : "Past Workload"}
-        />
+        <div className="toolbar-left">
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => handleOpenModal("createWorkday")}
+            disabled={isWorkdaySelected}
+          >
+            Create Workday
+          </Button>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={() => setConfirmDeleteModalOpen(true)}
+            disabled={!isWorkdaySelected} // Disable unless a workday is selected
+            sx={{ ml: 2 }}
+          >
+            Remove Workday
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => handleOpenModal("createShift")}
+            disabled={!isWorkdaySelected} // Enable only if a workday is selected
+            sx={{ ml: 2 }}
+          >
+            Create Shift
+          </Button>
+        </div>
+        <div className="toolbar-right">
+          <FormControlLabel
+            control={<Switch checked={isEnrolmentOpen} onChange={toggleEnrolmentOpen} color="primary" />}
+            label="Enrollment Open"
+          />
+          <FormControlLabel
+            control={<Switch checked={!futureOnly} onChange={toggleFutureOnly} color="primary" />}
+            label={futureOnly ? "Past Workload" : "Past Workload"}
+          />
+        </div>
       </div>
       <div className="dashboard-calendar">
         <FullCalendar
@@ -667,7 +719,7 @@ export const Dashboard = () => {
                 <Typography variant="subtitle1" sx={{ mb: 2 }}>
                   Fully Available Employees
                 </Typography>
-                <Box className="user-box" sx={{overflowY: "auto"}}>
+                <Box className="user-box" sx={{ overflowY: "auto" }}>
                   <Table stickyHeader>
                     <TableHead>
                       <TableRow>
@@ -707,7 +759,7 @@ export const Dashboard = () => {
                 <Typography variant="subtitle1" sx={{ mb: 2 }}>
                   Partly Available Employees
                 </Typography>
-                <Box className="user-box" sx={{overflowY: "auto"}}>
+                <Box className="user-box" sx={{ overflowY: "auto" }}>
                   <Table stickyHeader>
                     <TableHead>
                       <TableRow>
@@ -747,7 +799,7 @@ export const Dashboard = () => {
                 <Typography variant="subtitle1" sx={{ mb: 2 }}>
                   Unavailable Employees
                 </Typography>
-                <Box className="user-box" sx={{overflowY: "auto"}}>
+                <Box className="user-box" sx={{ overflowY: "auto" }}>
                   <Table stickyHeader>
                     <TableHead>
                       <TableRow>
@@ -755,7 +807,7 @@ export const Dashboard = () => {
                         <TableCell>Action</TableCell>
                       </TableRow>
                     </TableHead>
-                    <TableBody >
+                    <TableBody>
                       {unavailableEmployees
                         .filter((employee) => employee.role === "EMPLOYEE")
                         .map((employee) => (
@@ -786,7 +838,7 @@ export const Dashboard = () => {
                 <Typography variant="subtitle1" sx={{ mb: 2 }}>
                   Employees To Be Assigned
                 </Typography>
-                <Box className="user-box" sx={{overflowY: "auto"}}>
+                <Box className="user-box" sx={{ overflowY: "auto" }}>
                   <Table stickyHeader>
                     <TableHead>
                       <TableRow>
@@ -828,7 +880,7 @@ export const Dashboard = () => {
                 <Typography variant="subtitle1" sx={{ mb: 2 }}>
                   Assigned Employees
                 </Typography>
-                <Box className="user-box" sx={{overflowY: "auto"}}>
+                <Box className="user-box" sx={{ overflowY: "auto" }}>
                   <Table stickyHeader>
                     <TableHead>
                       <TableRow>
@@ -898,7 +950,7 @@ export const Dashboard = () => {
                 <Typography variant="subtitle1" sx={{ mb: 2 }}>
                   Fully Available Managers
                 </Typography>
-                <Box className="user-box" sx={{overflowY: "auto"}}>
+                <Box className="user-box" sx={{ overflowY: "auto" }}>
                   <Table stickyHeader>
                     <TableHead>
                       <TableRow>
@@ -934,7 +986,7 @@ export const Dashboard = () => {
                 <Typography variant="subtitle1" sx={{ mb: 2 }}>
                   Partly Available Managers
                 </Typography>
-                <Box className="user-box" sx={{overflowY: "auto"}}>
+                <Box className="user-box" sx={{ overflowY: "auto" }}>
                   <Table stickyHeader>
                     <TableHead>
                       <TableRow>
@@ -970,7 +1022,7 @@ export const Dashboard = () => {
                 <Typography variant="subtitle1" sx={{ mb: 2 }}>
                   Unavailable Managers
                 </Typography>
-                <Box className="user-box" sx={{overflowY: "auto"}}>
+                <Box className="user-box" sx={{ overflowY: "auto" }}>
                   <Table stickyHeader>
                     <TableHead>
                       <TableRow>
@@ -1007,7 +1059,7 @@ export const Dashboard = () => {
               <Typography variant="subtitle1" sx={{ mb: 2 }}>
                 Managers To Be Assigned
               </Typography>
-              <Box className="user-box" sx={{overflowY: "auto"}}>
+              <Box className="user-box" sx={{ overflowY: "auto" }}>
                 <Table stickyHeader>
                   <TableHead>
                     <TableRow>
@@ -1047,7 +1099,7 @@ export const Dashboard = () => {
               <Typography variant="subtitle1" sx={{ mb: 2 }}>
                 Assigned Managers
               </Typography>
-              <Box className="user-box" sx={{overflowY: "auto"}}>
+              <Box className="user-box" sx={{ overflowY: "auto" }}>
                 <Table stickyHeader>
                   <TableHead>
                     <TableRow>

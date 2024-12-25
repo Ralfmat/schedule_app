@@ -18,7 +18,7 @@ urlpatterns = [
     path('weekdays/update/<int:pk>/', WeekdayUpdateView.as_view(), name='weekday-update'),
     path('weekdays/delete/<int:pk>/', WeekdayDeleteView.as_view(), name='weekday-delete'),
 
-    path('availability/', AvailabilityListView.as_view(), name='availability-list'),  # Pass "workday_id" or "all" as query param
+    path('availability/', AvailabilityListView.as_view(), name='availability-list'),  # Pass "workday_id", "all_users" or boolean "future_only" as query param
     path('availability/create/', AvailabilityCreateView.as_view(), name='availability-create'),
     path('availability/<int:pk>/', AvailabilityDetailView.as_view(), name='availability-detail'),
     path('availability/update/<int:pk>/', AvailabilityUpdateView.as_view(), name='availability-update'),

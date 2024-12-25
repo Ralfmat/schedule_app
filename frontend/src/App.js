@@ -8,9 +8,10 @@ import {SignUp} from './component/SignUp';
 import { Account } from './component/Account';
 import { Employee } from './component/Employee';
 import { Manager } from './component/Manager';
-import { Calendar } from './component/Calendar';
+import { AvailabilityDashboard } from './component/AvailabilityDashboard';
 import { Dashboard } from './component/Dashboard';
 import { ProtectedManagerRoute } from "./utils/authUtils";
+import { ShiftAssignmentDashboard } from './component/ShiftAssignmentDashboard';
 
 function App() {
     return (
@@ -24,7 +25,8 @@ function App() {
           <Route path="/sign-up" element={<SignUp/>}/>
           <Route path="/employee" element={<Employee/>}/>
           <Route path="/manager" element={<Manager/>}/>
-          <Route path="/calendar" element={<Calendar/>}/>
+          <Route path="/availability" element={<AvailabilityDashboard/>}/>
+          <Route path="/assignment" element={<ShiftAssignmentDashboard/>}/>
           <Route path="/dashboard" 
             element={
             <ProtectedManagerRoute roleRequired="MANAGER">

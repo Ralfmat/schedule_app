@@ -2,6 +2,7 @@ from rest_framework import serializers
 from schedules.models import Shift, ShiftAssignment, Availability, ShiftSwapRequest, Weekday, Workday
 from accounts.models import Account
 from accounts.serializers import AccountDetailSerializer
+from django.utils.timezone import now
 
 # Weekday Serializer
 class WeekdayCreateUpdateSerializer(serializers.ModelSerializer):
@@ -31,12 +32,16 @@ class WorkdayDetailSerializer(serializers.ModelSerializer):
         fields = ('id', 'date', 'week_day', 'is_enrolment_open')
 
 class WorkdayCreateUpdateSerializer(serializers.ModelSerializer):
-    # Use PrimaryKeyRelatedField to refer to an existing Weekday by its ID for POST/PUT/PATCH
     week_day = serializers.PrimaryKeyRelatedField(queryset=Weekday.objects.all())
 
     class Meta:
         model = Workday
-        fields = ['date', 'week_day']
+        fields = ['date', 'week_day', 'is_enrolment_open']
+
+    def validate(self, data):
+        if data['date'] < now().date():
+            raise serializers.ValidationError("Cannot create a workday in the past.")
+        return data
 # ---
 
 # Availability Serializer
@@ -79,6 +84,10 @@ class AvailabilityCreateSerializer(serializers.ModelSerializer):
         # If there are any errors, raise ValidationError with the unified key
         if errors:
             raise serializers.ValidationError({"error_messages": errors})
+        
+        if workday.date < now().date():
+            raise serializers.ValidationError("Availability cannot be created for past dates.")
+
 
         return data
 # ---
@@ -111,6 +120,10 @@ class ShiftCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 f"Shift times must be within open hours: {weekday.open_at} - {weekday.close_at}."
             )
+        
+        # Check if the shift starts in the past
+        if workday.date < now().date():
+            raise serializers.ValidationError("Shifts cannot be created for past dates.")
 
         return data
 # ---
@@ -131,6 +144,14 @@ class ShiftAssignmentCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = ShiftAssignment
         fields = ['id', 'account_id', 'shift_id']
+
+    def validate(self, data):
+        # Retrieve the shift to check its date
+        shift = data['shift']
+        if shift.workday.date < now().date():
+            raise serializers.ValidationError("Assignments cannot be made for shifts in the past.")
+
+        return data
 # ---
 
 # Shift Swap Request Serializer

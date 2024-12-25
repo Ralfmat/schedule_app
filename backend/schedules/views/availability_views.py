@@ -5,6 +5,8 @@ from schedules.models import Availability
 from schedules.serializers import AvailabilityCreateSerializer, AvailabilitySerializer
 from schedules.permissions import IsManager
 
+from django.utils import timezone
+
 class AvailabilityDetailView(RetrieveAPIView):
     queryset = Availability.objects.all()
     serializer_class = AvailabilitySerializer
@@ -34,19 +36,19 @@ class AvailabilityListView(ListAPIView):
         # Get query parameters
         workday_id = self.request.query_params.get('workday_id')
         all_availabilities = self.request.query_params.get('all_users', 'false').lower() == 'true'
+        future_only = self.request.query_params.get('future_only', 'false').lower() == 'true'
         user = self.request.user
-
-        # If 'all_users' query param is true, return all availabilities, optionally filtered by workday
+    
         if all_availabilities and user.role == "MANAGER":
             queryset = Availability.objects.all()
-            if workday_id:
-                queryset = queryset.filter(workday_id=workday_id)
-            return queryset
+        else:
+            queryset = Availability.objects.filter(account=user)
 
-        # Otherwise, return availabilities for the logged-in user
-        queryset = Availability.objects.filter(account=user)
         if workday_id:
             queryset = queryset.filter(workday_id=workday_id)
+        if future_only:
+            queryset = queryset.filter(workday__date__gte=timezone.now())
+
         return queryset
 
 class AvailabilityUpdateView(UpdateAPIView):

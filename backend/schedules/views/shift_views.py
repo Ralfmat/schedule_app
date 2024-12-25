@@ -54,3 +54,14 @@ class ShiftUpdateView(UpdateAPIView):
 class ShiftDeleteView(DestroyAPIView):
     queryset = Shift.objects.all()
     # permission_classes = (IsAuthenticated, IsManager)
+    
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        # Check if the shift is in the past
+        if instance.date < timezone.now().date():
+            return Response(
+                {"detail": "Shifts in the past cannot be deleted."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { Button, Typography, Modal, Box, TextField } from "@mui/material";
+import { Button, Typography, Modal, Box, TextField, Card, CardContent } from "@mui/material";
 import {
   fetchWeekdays,
   fetchWorkdays,
@@ -12,22 +12,19 @@ import {
   deleteAvailability,
 } from "../utils/dataUtils";
 import { formatTime } from "../utils/funcUtils";
-import "./Calendar.css";
+import "./AvailabilityDashboard.css";
+import { Height } from "@mui/icons-material";
 
-export const Calendar = () => {
+export const AvailabilityDashboard = () => {
   const [account, setAccount] = useState(null);
   const [workdays, setWorkdays] = useState([]);
   const [availability, setAvailability] = useState([]);
   const [selectedWorkday, setSelectedWorkday] = useState(null);
   const [selectedAvailability, setSelectedAvailability] = useState(null);
-  const [isAddAvailabilityDisabled, setIsAddAvailabilityDisabled] =
-    useState(false);
-  const [isRemoveAvailabilityDisabled, setIsRemoveAvailabilityDisabled] =
-    useState(true);
-  const [isCreateAvailabilityModalOpen, setIsCreateAvailabilityModalOpen] =
-    useState(false);
-  const [isConfirmDeleteModalOpen, setIsConfirmDeleteModalOpen] =
-    useState(false);
+  const [isAddAvailabilityDisabled, setIsAddAvailabilityDisabled] = useState(false);
+  const [isRemoveAvailabilityDisabled, setIsRemoveAvailabilityDisabled] = useState(true);
+  const [isCreateAvailabilityModalOpen, setIsCreateAvailabilityModalOpen] = useState(false);
+  const [isConfirmDeleteModalOpen, setIsConfirmDeleteModalOpen] = useState(false);
   const [availabilityForm, setAvailabilityForm] = useState({
     start_time: "",
     end_time: "",
@@ -39,7 +36,7 @@ export const Calendar = () => {
       const [weekdays, workdays, availability, account] = await Promise.all([
         fetchWeekdays(),
         fetchWorkdays(true),
-        fetchAvailability(null, false),
+        fetchAvailability(null, false, true),
         fetchCurrentAccount(),
       ]);
       setAccount(account);
@@ -57,21 +54,13 @@ export const Calendar = () => {
     if (workday) {
       setSelectedWorkday(workday);
 
-      const hasAvailability = availability.some(
-        (avail) => avail.workday.id === workday.id
-      );
+      const hasAvailability = availability.some((avail) => avail.workday.id === workday.id);
 
-      const selectedAvailabilities = availability.filter(
-        (avail) => avail.workday.id === workday.id
-      );
+      const selectedAvailabilities = availability.filter((avail) => avail.workday.id === workday.id);
 
-      setSelectedAvailability(
-        selectedAvailabilities.length > 0 ? selectedAvailabilities[0] : null
-      );
+      setSelectedAvailability(selectedAvailabilities.length > 0 ? selectedAvailabilities[0] : null);
 
-      setIsAddAvailabilityDisabled(
-        hasAvailability || !workday.is_enrolment_open
-      );
+      setIsAddAvailabilityDisabled(hasAvailability || !workday.is_enrolment_open);
       setIsRemoveAvailabilityDisabled(!hasAvailability);
     } else {
       setSelectedWorkday(null);
@@ -88,21 +77,13 @@ export const Calendar = () => {
     if (clickedWorkday) {
       setSelectedWorkday(clickedWorkday);
 
-      const hasAvailability = availability.some(
-        (avail) => avail.workday.id === clickedWorkday.id
-      );
+      const hasAvailability = availability.some((avail) => avail.workday.id === clickedWorkday.id);
 
-      const selectedAvailabilities = availability.filter(
-        (avail) => avail.workday.id === clickedWorkday.id
-      );
+      const selectedAvailabilities = availability.filter((avail) => avail.workday.id === clickedWorkday.id);
 
-      setSelectedAvailability(
-        selectedAvailabilities.length > 0 ? selectedAvailabilities[0] : null
-      );
+      setSelectedAvailability(selectedAvailabilities.length > 0 ? selectedAvailabilities[0] : null);
 
-      setIsAddAvailabilityDisabled(
-        hasAvailability || !clickedWorkday.is_enrolment_open
-      );
+      setIsAddAvailabilityDisabled(hasAvailability || !clickedWorkday.is_enrolment_open);
       setIsRemoveAvailabilityDisabled(!hasAvailability);
     }
   };
@@ -134,17 +115,15 @@ export const Calendar = () => {
       return;
     }
 
-    const updatedAvailability = await fetchAvailability(null, false);
+    const updatedAvailability = await fetchAvailability(null, false, true);
 
     const newAvailability = updatedAvailability.find(
       (avail) => !availability.some((existing) => existing.id === avail.id)
     );
 
-    // Update state with the new availability
     setAvailability(updatedAvailability);
     setSelectedAvailability(newAvailability || null);
 
-    // Reset form and close modal
     setIsRemoveAvailabilityDisabled(false);
     setIsAddAvailabilityDisabled(true);
     setAvailabilityForm({ start_time: "", end_time: "" });
@@ -156,7 +135,7 @@ export const Calendar = () => {
 
     try {
       await deleteAvailability(selectedAvailability.id);
-      const updatedAvailability = await fetchAvailability(null, false);
+      const updatedAvailability = await fetchAvailability(null, false, true);
       setAvailability(updatedAvailability);
       setSelectedAvailability(null);
       setIsRemoveAvailabilityDisabled(true);
@@ -186,9 +165,7 @@ export const Calendar = () => {
       start: workday.date,
       end: workday.date,
       display: "background",
-      className: `custom-workday-event ${
-        selectedWorkday?.id === workday.id ? "selected-workday" : ""
-      }`,
+      className: `custom-workday-event ${selectedWorkday?.id === workday.id ? "selected-workday" : ""}`,
       color: workday.is_enrolment_open ? "#00ff00" : "#ff0000",
     }));
   };
@@ -212,78 +189,133 @@ export const Calendar = () => {
 
   return (
     <div className="employee-dashboard-window">
-      <div className="employee-dashboard-toolbar">
-        <h1>Employee Dashboard</h1>
-      </div>
       <div className="main-container">
-        <div className="left-container">
-          <div>
+        <div className="containers">
+          <div className="left-container">
             <div className="toolbar-buttons">
-                <Button
-                  variant="contained"
-                  color="primary"
-                  disabled={isAddAvailabilityDisabled}
-                  onClick={() => handleOpenModal("createAvailability")}
-                >
-                  Add availability
-                </Button>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  disabled={isRemoveAvailabilityDisabled}
-                  onClick={() => handleOpenModal("confirmDelete")}
-                >
-                  Remove availability
-                </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                disabled={isAddAvailabilityDisabled}
+                onClick={() => handleOpenModal("createAvailability")}
+                sx={{ marginRight: "1rem" }}
+              >
+                Add availability
+              </Button>
+              <Button
+                variant="contained"
+                color="secondary"
+                disabled={isRemoveAvailabilityDisabled}
+                onClick={() => handleOpenModal("confirmDelete")}
+              >
+                Remove availability
+              </Button>
+            </div>
+            <div className="employee-dashboard-calendar">
+              <FullCalendar
+                key={workdayEvents.length + availabilityEvents.length}
+                firstDay={1}
+                weekends={true}
+                aspectRatio={0.9}
+                plugins={[dayGridPlugin, interactionPlugin]}
+                initialView="dayGridMonth"
+                selectable={true}
+                select={handleDateSelect}
+                // headerToolbar={false}
+                events={[...workdayEvents, ...availabilityEvents]}
+                eventContent={(eventInfo) => (
+                  <div>
+                    <span>{eventInfo.event.title}</span>
+                  </div>
+                )}
+                dayMaxEvents={true}
+                eventClick={handleEventClick}
+              />
             </div>
           </div>
-          <div className="employee-dashboard-calendar">
-            <FullCalendar
-              key={workdayEvents.length + availabilityEvents.length}
-              firstDay={1}
-              weekends={true}
-              aspectRatio={0.9}
-              plugins={[dayGridPlugin, interactionPlugin]}
-              initialView="dayGridMonth"
-              selectable={true}
-              select={handleDateSelect}
-              headerToolbar={false}
-              events={[...workdayEvents, ...availabilityEvents]}
-              eventContent={(eventInfo) => (
-                <div>
-                  <span>{eventInfo.event.title}</span>
-                </div>
-              )}
-              dayMaxEvents={true}
-              eventClick={handleEventClick}
-            />
-          </div>
-        </div>
-        <div className="right-container">
-          <Typography>Workday Details</Typography>
-          <div>
-            {selectedWorkday && selectedWorkday.week_day
-              ? `${formatTime(selectedWorkday.week_day.open_at)} - ${formatTime(
-                  selectedWorkday.week_day.close_at
-                )}`
-              : ""}
-          </div>
-          <div>
-            {selectedWorkday && selectedWorkday.week_day
-              ? selectedWorkday.week_day.day_name
-              : ""}
-          </div>
-          {selectedAvailability && (
-            <div>
-              <Typography>Availability Details</Typography>
-              <div>{selectedAvailability.start_time}</div>
-              <div>{selectedAvailability.end_time}</div>
-            </div>
-          )}
-          <div>
-            {selectedWorkday?.is_enrolment_open
-              ? "Enrolment open"
-              : "Enrolment closed"}
+          <div className="right-container">
+            <div style={{ width: "30vw", height: "5rem" }}></div>
+            <Card
+              sx={{
+                boxShadow: 5,
+                borderRadius: 5,
+                padding: 3,
+                bgcolor: selectedWorkday?.is_enrolment_open ? "#e0ffe0" : "#ffe0e0",
+                maxWidth: "400px",
+                width: "100%",
+                margin: "auto",
+                marginBottom: "20px",
+              }}
+            >
+              <CardContent>
+                <Typography variant="h4" gutterBottom>
+                  Workday Info
+                </Typography>
+                {selectedWorkday ? (
+                  <>
+                    <Typography variant="body1" sx={{ fontSize: "18px" }}>
+                      <strong>Date:</strong> {selectedWorkday.date}
+                    </Typography>
+                    <Typography variant="body1" sx={{ fontSize: "18px" }}>
+                      <strong>Day:</strong> {selectedWorkday.week_day.day_name}
+                    </Typography>
+                    <Typography variant="body1" sx={{ fontSize: "18px" }}>
+                      <strong>Open Hours:</strong>{" "}
+                      {`${formatTime(selectedWorkday.week_day.open_at)} - ${formatTime(
+                        selectedWorkday.week_day.close_at
+                      )}`}
+                    </Typography>
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        fontSize: "18px",
+                        color: selectedWorkday.is_enrolment_open ? "green" : "red",
+                      }}
+                    >
+                      <strong>Status:</strong>{" "}
+                      {selectedWorkday.is_enrolment_open ? "Enrolment open" : "Enrolment closed"}
+                    </Typography>
+                  </>
+                ) : (
+                  <Typography variant="body2" color="text.secondary">
+                    Select a workday to view details.
+                  </Typography>
+                )}
+              </CardContent>
+            </Card>
+            {selectedAvailability && (
+              <>
+                <Card
+                  sx={{
+                    boxShadow: 5,
+                    borderRadius: 5,
+                    padding: 3,
+                    bgcolor: "#e0e0ff",
+                    maxWidth: "400px",
+                    width: "100%",
+                    margin: "auto",
+                  }}
+                >
+                  <CardContent>
+                    <Typography variant="h4" gutterBottom>
+                      Availability Info
+                    </Typography>
+                    {selectedAvailability && (
+                      <>
+                        <Typography variant="body1" sx={{ fontSize: "18px" }}>
+                          <strong>Start Time:</strong>
+                          {` ${formatTime(selectedAvailability.start_time)}`}
+                        </Typography>
+                        <Typography variant="body1" sx={{ fontSize: "18px" }}>
+                          <strong>End Time:</strong>
+                          {` ${formatTime(selectedAvailability.end_time)}`}
+                        </Typography>
+                      </>
+                    )}
+                  </CardContent>
+                </Card>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -304,11 +336,7 @@ export const Calendar = () => {
             width: "40vw",
           }}
         >
-          <Typography
-            id="create-availability-title"
-            variant="h6"
-            component="h2"
-          >
+          <Typography id="create-availability-title" variant="h6" component="h2">
             Create Availability
           </Typography>
           {selectedWorkday && (
@@ -317,8 +345,7 @@ export const Calendar = () => {
               <br />
               <strong>Day:</strong> {selectedWorkday.week_day.day_name}
               <br />
-              <strong>Open Hours:</strong>{" "}
-              {formatTime(selectedWorkday.week_day.open_at)} -{" "}
+              <strong>Open Hours:</strong> {formatTime(selectedWorkday.week_day.open_at)} -{" "}
               {formatTime(selectedWorkday.week_day.close_at)}
             </Typography>
           )}
@@ -353,14 +380,9 @@ export const Calendar = () => {
           />
 
           <Box display="flex" justifyContent="space-between" mt={4}>
-            <Button
-              onClick={handleCreateAvailability}
-              variant="contained"
-              color="primary"
-            >
+            <Button onClick={handleCreateAvailability} variant="contained" color="primary">
               Confirm
             </Button>
-            {/* Button to Set Default Times */}
             <Button
               variant="outlined"
               onClick={() => {
@@ -374,11 +396,7 @@ export const Calendar = () => {
             >
               Set to Workday Times
             </Button>
-            <Button
-              onClick={handleCloseModal}
-              variant="outlined"
-              color="secondary"
-            >
+            <Button onClick={handleCloseModal} variant="outlined" color="secondary">
               Cancel
             </Button>
           </Box>
@@ -402,23 +420,13 @@ export const Calendar = () => {
           <Typography id="confirm-delete-title" variant="h6">
             Confirm Deletion
           </Typography>
-          <Typography sx={{ mt: 2 }}>
-            Are you sure you want to remove this availability?
-          </Typography>
+          <Typography sx={{ mt: 2 }}>Are you sure you want to remove this availability?</Typography>
           <Box display="flex" justifyContent="space-between" mt={4}>
-            <Button
-              variant="outlined"
-              color="error"
-              onClick={handleRemoveAvailability}
-            >
-              Yes, REmove
+            <Button variant="outlined" color="error" onClick={handleRemoveAvailability}>
+              Yes, Remove
             </Button>
-            <Button
-              variant="outlined"
-              color="secondary"
-              onClick={handleCloseModal}
-            >
-              Cancle
+            <Button variant="outlined" color="secondary" onClick={handleCloseModal}>
+              Cancel
             </Button>
           </Box>
         </Box>
@@ -427,4 +435,4 @@ export const Calendar = () => {
   );
 };
 
-export default Calendar;
+export default AvailabilityDashboard;

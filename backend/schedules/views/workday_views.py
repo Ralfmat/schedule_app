@@ -2,6 +2,8 @@ from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveAPIView,
 from rest_framework.permissions import IsAuthenticated
 from schedules.permissions import IsManager
 from django.utils import timezone
+from rest_framework.response import Response
+from rest_framework import status
 
 from schedules.models import Workday
 from schedules.serializers import WorkdayCreateUpdateSerializer, WorkdayDetailSerializer
@@ -40,5 +42,15 @@ class WorkdayUpdateView(UpdateAPIView):
         return self.partial_update(request, *args, **kwargs)
 
 class WorkdayDeleteView(DestroyAPIView):
-    # permission_class = (IsAuthenticated, IsManager)
+    # permission_classes = (IsAuthenticated, IsManager)
     queryset = Workday.objects.all()
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.date < timezone.now().date():
+            return Response(
+                {"detail": "Workdays in the past cannot be deleted."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)

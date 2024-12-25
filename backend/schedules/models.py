@@ -1,5 +1,7 @@
 from django.db import models
+from django.forms import ValidationError
 from accounts.models import Account
+from django.utils.timezone import now
 
 class Weekday(models.Model):
     DAY_CHOICES = [
@@ -23,6 +25,10 @@ class Weekday(models.Model):
 
     def __str__(self) -> str:
         return f"Week day: {self.day_name}"
+    
+    def clean(self):
+        if self.date < now().date():
+            raise ValidationError("Cannot modify a Weekday that is in the past.")
 
 
 class Workday(models.Model):
@@ -37,6 +43,10 @@ class Workday(models.Model):
 
     def __str__(self) -> str:
         return f"Workday: {self.date}"
+    
+    def clean(self):
+        if self.date < now().date():
+            raise ValidationError("Cannot modify a workday that is in the past.")
 
 
 class Availability(models.Model):
@@ -53,6 +63,10 @@ class Availability(models.Model):
 
     def __str__(self) -> str:
         return f"{self.account.username} - {self.workday.date} ({self.start_time}-{self.end_time})"
+    
+    def clean(self):
+        if self.date < now().date():
+            raise ValidationError("Cannot modify a Availability that is in the past.")
 
 
 class Shift(models.Model):
@@ -67,6 +81,10 @@ class Shift(models.Model):
 
     def __str__(self) -> str:
         return f"Shift: {self.id} ({self.start_time}-{self.end_time})"
+    
+    def clean(self):
+        if self.date < now().date():
+            raise ValidationError("Cannot modify a Shift that is in the past.")
 
 
 class ShiftAssignment(models.Model):
@@ -80,6 +98,10 @@ class ShiftAssignment(models.Model):
 
     def __str__(self) -> str:
         return f"{self.account.username} assigned to Shift {self.shift.id}"
+    
+    def clean(self):
+        if self.date < now().date():
+            raise ValidationError("Cannot modify a Shift Assignment that is in the past.")
 
 class ShiftSwapRequest(models.Model):
     SHIFT_SWAP_STATUS_CHOICES = (
@@ -103,4 +125,8 @@ class ShiftSwapRequest(models.Model):
 
     def __str__(self):
         return f"{self.requesting_employee.username} requests to swap with {self.target_employee.username} for Shift {self.shift.id}"
+    
+    def clean(self):
+        if self.date < now().date():
+            raise ValidationError("Cannot modify a workday that is in the past.")
 
