@@ -13,7 +13,6 @@ import {
 } from "../utils/dataUtils";
 import { formatTime } from "../utils/funcUtils";
 import "./AvailabilityDashboard.css";
-import { Height } from "@mui/icons-material";
 
 export const AvailabilityDashboard = () => {
   const [account, setAccount] = useState(null);
@@ -221,7 +220,6 @@ export const AvailabilityDashboard = () => {
                 initialView="dayGridMonth"
                 selectable={true}
                 select={handleDateSelect}
-                // headerToolbar={false}
                 events={[...workdayEvents, ...availabilityEvents]}
                 eventContent={(eventInfo) => (
                   <div>
@@ -234,7 +232,6 @@ export const AvailabilityDashboard = () => {
             </div>
           </div>
           <div className="right-container">
-            <div style={{ width: "30vw", height: "5rem" }}></div>
             <Card
               sx={{
                 boxShadow: 5,

@@ -90,14 +90,12 @@ export const ShiftAssignmentDashboard = () => {
             </div>
           </div>
           <div className="right-container">
-            {/* <div style={{ width: "30vw" }}></div> */}
             <Card
               sx={{
                 boxShadow: 5,
                 borderRadius: 5,
                 padding: 3,
                 bgcolor: "#e0e0ff",
-                // maxWidth: "400px",
                 width: "100%",
                 margin: "auto",
                 marginBottom: "20px",
@@ -188,61 +186,6 @@ export const ShiftAssignmentDashboard = () => {
           </div>
         </div>
       </div>
-
-      {/* Assignment Details Modal */}
-      {/* <Modal open={openModal} onClose={handleCloseModal}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 600,
-            bgcolor: "background.paper",
-            border: "2px solid #000",
-            boxShadow: 24,
-            borderRadius: 4,
-            p: 4,
-          }}
-        >
-          {selectedAssignment && (
-            <>
-              <Typography variant="h5" gutterBottom>
-                Assignment Details
-              </Typography>
-              <Typography variant="body1" gutterBottom>
-                <strong>Date:</strong> {formatDate(selectedAssignment.shift.workday.date)}
-              </Typography>
-              <Typography variant="body1" gutterBottom>
-                <strong>Time:</strong>{" "}
-                {`${formatTime(selectedAssignment.shift.start_time)} - ${formatTime(
-                  selectedAssignment.shift.end_time
-                )}`}
-              </Typography>
-              <Typography variant="body1" gutterBottom>
-                <strong>Manager:</strong> {selectedAssignment.shift.account.find((account) => account.role === "manager")[0].username}
-              </Typography>
-              <Typography variant="h6" sx={{ mt: 3 }}>
-                Other Assigned Employees
-              </Typography>
-              <ul style={{ listStyleType: "none", padding: 0 }}>
-                {selectedAssignment.shift.employees
-                  .filter((employee) => employee.id !== selectedAssignment.account.id)
-                  .map((employee) => (
-                    <li key={employee.id} style={{ marginBottom: 4 }}>
-                      {employee.username} - {`${employee.first_name} ${employee.last_name}`}
-                    </li>
-                  ))}
-              </ul>
-              <Box display="flex" justifyContent="flex-end" mt={4}>
-                <Button variant="contained" color="secondary" onClick={handleCloseModal}>
-                  Close
-                </Button>
-              </Box>
-            </>
-          )}
-        </Box>
-      </Modal> */}
     </div>
   );
 };

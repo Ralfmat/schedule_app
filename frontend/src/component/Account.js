@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import { fetchData } from "../utils/apiUtils";
 import { fetchCurrentAccount } from "../utils/dataUtils";
-import "./Account.css"; // Import the CSS file
+import "./Account.css";
 import ErrorMessage from "../utils/errorUtlis";
 
 export const Account = () => {
@@ -11,7 +10,6 @@ export const Account = () => {
     useEffect(() => {
         const fetchAccount = async () => {
             const account = await fetchCurrentAccount();
-            // const account = null
             setAccount(account);
             setLoading(false);
         };

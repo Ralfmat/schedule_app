@@ -17,7 +17,6 @@ import {
   FormControlLabel,
   Switch,
 } from "@mui/material";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 import "./ManagerDashboard.css";
 
@@ -98,7 +97,7 @@ export const ManagerDashboard = () => {
 
   useEffect(() => {
     const loadEmployeesAndManagers = async () => {
-      const accounts = await fetchAccounts(); // Fetch all accounts
+      const accounts = await fetchAccounts();
 
       if (selectedShift) {
         try {
@@ -112,14 +111,14 @@ export const ManagerDashboard = () => {
             .filter((assignment) => assignment.account.role === "EMPLOYEE")
             .map((assignment) => ({
               ...assignment.account,
-              assignment_id: assignment.id, // Include assignment_id
+              assignment_id: assignment.id,
             }));
 
           const assignedManagers = shiftAssignments
             .filter((assignment) => assignment.account.role === "MANAGER")
             .map((assignment) => ({
               ...assignment.account,
-              assignment_id: assignment.id, // Include assignment_id
+              assignment_id: assignment.id,
             }));
 
           setAssignedEmployees(assignedEmployees);
@@ -299,7 +298,6 @@ export const ManagerDashboard = () => {
 
   const toggleFutureOnly = () => {
     setFutureOnly((prev) => !prev);
-    // loadWorkdaysAndShifts(); // Refresh workdays and shifts
   };
 
   const toggleEnrolmentOpen = async () => {
@@ -335,7 +333,6 @@ export const ManagerDashboard = () => {
       const selectedWeekday = weekdays.find((day) => day.day_name === formData.week_day);
       const weekdayId = selectedWeekday ? selectedWeekday.id : null;
 
-      // Check if weekdayId is valid before proceeding
       if (!weekdayId) {
         console.error("Weekday ID not found for:", formData.week_day);
         return;
@@ -405,7 +402,6 @@ export const ManagerDashboard = () => {
       );
       setSelectedShift(newShift);
       setShifts(updatedShifts);
-      // handleCloseModal(); // Close the modal after successful creation
       handleOpenModal("modifyShift");
     } catch (error) {
       console.error("Error creating shift:", error);
@@ -476,12 +472,12 @@ export const ManagerDashboard = () => {
 
   const handleAddToAssign = (employee) => {
     setEmployeesToBeAssigned((prev) => [...prev, employee]);
-    removeEmployeeFromGroups(employee); // Remove from other groups
+    removeEmployeeFromGroups(employee);
   };
 
   const handleRemoveFromToBeAssigned = (employee) => {
     setEmployeesToBeAssigned((prev) => prev.filter((e) => e.id !== employee.id));
-    restoreToPreviousGroup(employee); // Restore to the correct group
+    restoreToPreviousGroup(employee);
   };
 
   const handleRemoveFromAssigned = (employee) => {
@@ -584,7 +580,6 @@ export const ManagerDashboard = () => {
       setManagersToBeAssigned([]);
       setManagersToBeUnassigned([]);
 
-      // Close the modal
       handleCloseModal();
     } catch (error) {
       console.error("Error confirming assignments:", error);
