@@ -34,6 +34,7 @@ import {
   postAssignment,
   deleteAssignment,
   updateWorkday,
+  updateWeekday,
 } from "../utils/dataUtils";
 
 import { isWithinShiftHours, isPartlyWithinShiftHours, formatDate, formatTime } from "../utils/funcUtils";
@@ -76,10 +77,25 @@ export const ManagerDashboard = () => {
 
   const [isEnrolmentOpen, setIsEnrolmentOpen] = useState(false);
 
+  const [weekdayModalOpen, setWeekdayModalOpen] = useState(false);
+  const [editingWeekdays, setEditingWeekdays] = useState([]);
+
   useEffect(() => {
     const loadWeekdays = async () => {
       const weekdays = await fetchWeekdays();
       setWeekdays(weekdays);
+
+      const DAY_ORDER = {
+        Monday: 0,
+        Tuesday: 1,
+        Wednesday: 2,
+        Thursday: 3,
+        Friday: 4,
+        Saturday: 5,
+        Sunday: 6,
+      };
+      const sortedWeekdays = weekdays.sort((a, b) => DAY_ORDER[a.day_name] - DAY_ORDER[b.day_name]);
+      setEditingWeekdays(sortedWeekdays);
     };
     const loadWorkdays = async () => {
       const workdays = await fetchWorkdays(futureOnly);
@@ -239,7 +255,6 @@ export const ManagerDashboard = () => {
     const workday = workdays.find((workday) => workday.date === startStr);
     if (workday) {
       setIsEnrolmentOpen(workday.is_enrolment_open);
-      console.log(isEnrolmentOpen);
     }
     const isWorkday = !!workday; // Boolean to check if workday exists
     setIsWorkdaySelected(isWorkday);
@@ -266,6 +281,42 @@ export const ManagerDashboard = () => {
       ...prevFormData,
       [name]: value,
     }));
+  };
+
+  const handleOpenHoursClick = () => {
+    setWeekdayModalOpen(true);
+  };
+
+  const handleWeekdayChange = (dayName, field, value) => {
+    setEditingWeekdays((prev) => prev.map((day) => (day.day_name === dayName ? { ...day, [field]: value } : day)));
+  };
+
+  const handleSaveWeekdays = async () => {
+    try {
+      for (const day of editingWeekdays) {
+        // Find the original weekday to compare against
+        const originalDay = weekdays.find((weekday) => weekday.id === day.id);
+
+        if (originalDay) {
+          // Check if either open_at or close_at has changed
+          if (originalDay.open_at !== day.open_at || originalDay.close_at !== day.close_at) {
+            await updateWeekday(day.id, { open_at: day.open_at, close_at: day.close_at });
+          }
+        } else {
+          console.error("Original weekday not found for:", day.id);
+        }
+      }
+
+      setWeekdays([...editingWeekdays]); // Update the state with new data
+      setWeekdayModalOpen(false);
+    } catch (error) {
+      console.error("Error updating weekdays:", error);
+    }
+  };
+
+  const handleCloseWeekdayModal = () => {
+    setEditingWeekdays([...weekdays]); // Reset to original state if changes are not saved
+    setWeekdayModalOpen(false);
   };
 
   const handleOpenModal = (type) => {
@@ -358,7 +409,6 @@ export const ManagerDashboard = () => {
     try {
       // Find the workday ID for the selected date
       const workdayToRemove = workdays.find((workday) => workday.date === selectedDate);
-      console.log(workdayToRemove);
 
       if (workdayToRemove) {
         await deleteWorkday(workdayToRemove.id);
@@ -549,7 +599,6 @@ export const ManagerDashboard = () => {
 
       // Process "to be unassigned" group
       for (const employee of employeesToBeUnassigned) {
-        console.log(employee);
         if (employee.assignment_id) {
           await deleteAssignment(employee.assignment_id);
         }
@@ -617,6 +666,7 @@ export const ManagerDashboard = () => {
             Create Shift
           </Button>
         </div>
+
         <div className="toolbar-right">
           <FormControlLabel
             control={<Switch checked={isEnrolmentOpen} onChange={toggleEnrolmentOpen} color="primary" />}
@@ -626,6 +676,15 @@ export const ManagerDashboard = () => {
             control={<Switch checked={!futureOnly} onChange={toggleFutureOnly} color="primary" />}
             label={futureOnly ? "Past Workload" : "Past Workload"}
           />
+          <Button
+            variant="contained"
+            color="warning"
+            onClick={handleOpenHoursClick}
+            // disabled={!isWorkdaySelected} // Enable only if a workday is selected
+            sx={{ ml: 1 }}
+          >
+            Open Hours
+          </Button>
         </div>
       </div>
       <div className="dashboard-calendar">
@@ -1317,6 +1376,63 @@ export const ManagerDashboard = () => {
               Yes, Remove
             </Button>
             <Button onClick={() => setConfirmDeleteModalOpen(false)} variant="outlined" color="secondary">
+              Cancel
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
+      {/* Edit week days modal */}
+      <Modal open={weekdayModalOpen} onClose={handleCloseWeekdayModal} aria-labelledby="weekday-modal-title">
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: "background.paper",
+            border: "2px solid #000",
+            boxShadow: 24,
+            p: 4,
+          }}
+        >
+          <Typography id="weekday-modal-title" variant="h6" component="h2" sx={{ mb: 2 }}>
+            Edit Open Hours
+          </Typography>
+          {editingWeekdays.map((day, index) => (
+            <Box
+              key={day.id}
+              sx={{
+                mb: 2,
+                display: "flex",
+                alignItems: "center",
+                flexDirection: "row",
+                justifyContent: "space-between",
+              }}
+            >
+              <Typography>{day.day_name}:</Typography>
+              <div style={{ display: "flex", flexDirection: "row" }}>
+                <TextField
+                  label="Open At"
+                  type="time"
+                  value={day.open_at}
+                  onChange={(e) => handleWeekdayChange(day.day_name, "open_at", e.target.value)}
+                  sx={{ mr: 2 }}
+                />
+                <TextField
+                  label="Close At"
+                  type="time"
+                  value={day.close_at}
+                  onChange={(e) => handleWeekdayChange(day.day_name, "close_at", e.target.value)}
+                />
+              </div>
+            </Box>
+          ))}
+          <Box display="flex" justifyContent="space-between" mt={4}>
+            <Button onClick={handleSaveWeekdays} variant="contained" color="primary">
+              Save
+            </Button>
+            <Button onClick={handleCloseWeekdayModal} variant="outlined" color="secondary">
               Cancel
             </Button>
           </Box>

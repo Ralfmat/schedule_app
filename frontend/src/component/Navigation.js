@@ -42,7 +42,6 @@ export function Navigation() {
       <Navbar bg="dark" variant="dark" className="navbar-fixed">
         <Navbar.Brand href="/">Schedule App</Navbar.Brand>
         <Nav className="me-auto">
-          {/* {isAuth ? <Nav.Link href="/">Home</Nav.Link> : null} */}
           {isAuth ? <Nav.Link href="/assignment">Assignment</Nav.Link> : null}
           {isAuth ? <Nav.Link href="/availability">Availability</Nav.Link> : null}
           {isAuth && localStorage.getItem("user_role") === "MANAGER" ? (

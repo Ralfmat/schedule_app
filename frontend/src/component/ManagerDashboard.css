@@ -28,7 +28,7 @@
 }
 
 .assigned-row {
-  background-color: #e0e0e0; /* Light gray background */
+  background-color: #e0e0e0;
 }
 
 .to-be-unassigned {
@@ -104,7 +104,7 @@
 
 /* Today Highlight */
 .fc-day-today {
-  background-color: #f1f3f4 !important;
+  background-color: #d4d4d4 !important;
   border: 1px solid #dadce0;
 }
 

@@ -1,0 +1,14 @@
+.home-container {
+    /* background: linear-gradient(135deg, #e8f5e9, #e0f2f1); */
+    min-height: 100vh;
+    padding: 20px;
+    width: 60%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-self: center;
+  }
+  
+  .home-title {
+    font-family: 'Roboto', sans-serif;
+  }

@@ -142,6 +142,15 @@ export const updateWorkday = async (workdayId, data) => {
   }
 };
 
+export const updateWeekday = async (weekdayId, data) => {
+  try {
+    const request = await patchData(`schedule/weekdays/update/${weekdayId}/`, data);
+    return request.data;
+  } catch (error) {
+    console.error("Error updating weekday:", error);
+  }
+};
+
 export const deleteWorkday = async (workday_id) => {
   try {
     const request = await deleteData(`schedule/workdays/delete/${workday_id}/`);

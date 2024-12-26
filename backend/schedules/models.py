@@ -25,10 +25,6 @@ class Weekday(models.Model):
 
     def __str__(self) -> str:
         return f"Week day: {self.day_name}"
-    
-    def clean(self):
-        if self.date < now().date():
-            raise ValidationError("Cannot modify a Weekday that is in the past.")
 
 
 class Workday(models.Model):

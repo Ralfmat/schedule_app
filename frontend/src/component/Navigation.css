@@ -4,4 +4,18 @@
     width: 100%;
     z-index: 1030; /* Ensure it's above other content */
   }
+
+.navbar-fixed a {
+  padding-left: 1rem;
+}
+
+.me-auto {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.me-auto a {
+  margin-right: 5rem;
+}
   

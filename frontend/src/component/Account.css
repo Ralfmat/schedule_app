@@ -1,77 +1,48 @@
-@keyframes spin {
+.account-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 15vh;
+  }
+  
+  .account-center {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+    width: 50%; /* Adjust based on your screen size */
+    max-width: 600px;
+  }
+  
+  .account-title {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  .account-info {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .info-item {
+    padding: 10px;
+    border-bottom: 1px solid #e0e0e0;
+    color: #555;
+  }
+  
+  .loading-spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 50px auto;
+  }
+  
+  @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
-}
-.account-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 30vh;
-}
-.loading-spinner {
-    margin-top: 10rem;
-    width: 10rem;
-    height: 10rem;
-    border: 4px solid rgba(195, 195, 195, 0.25);
-    border-radius: 50%;
-    border-top-color: #6f6f6f;
-    animation: spin 1s ease-in-out infinite;
-}
-
-.account-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto;
-    padding: 20px;
-    max-width: 800px;
-}
-
-.title {
-    text-align: center;
-    margin-top: 1rem;
-    margin-bottom: 6rem;
-}
-
-.account-sections {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    width: 50%;
-}
-
-.account-section {
-    border-radius: 10px;
-    margin: 0 10px;
-    text-align: center;
-    background-color: #0d6efd;
-    color: white;
-    margin-bottom: 5rem;
-}
-
-.account-section h3 {
-    padding: 20px 10px 20px 10px;
-    margin: 0;
-    background-color: white;
-    color: black;
-    border: 1px solid #0d6efd;
-    
-}
-
-.account-section ul{
-    padding: 10px;
-    margin: 0;
-}
-
-.account-item {
-    border-radius: 5px;
-    list-style: none;
-}
-
-.to-be-clicked:hover{
-    cursor: pointer;
-}
-
-.account-item div {
-    margin: 5px 0;
-}
+  }
