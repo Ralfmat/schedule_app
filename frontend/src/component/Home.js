@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Typography, Card, CardContent, Box, Grid, Paper } from "@mui/material";
+import { Typography, CardContent, Grid, Paper } from "@mui/material";
 import { fetchAssignments, fetchWeekdays } from "../utils/dataUtils";
-import { formatDate, formatTime } from "../utils/funcUtils";
+import { formatTime } from "../utils/funcUtils";
 import "./Home.css";
 
 export const Home = () => {

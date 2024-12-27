@@ -30,14 +30,12 @@
 }
 
 .error {
-  /* transform: translateY(-50%); */
   background-color: #ffdddd;
   border: 1px solid red;
   padding: 5px;
   margin: 5px;
   border-radius: 5px;
   font-size: 0.8rem;
-  /* white-space: nowrap; */
 }
 
 .btn-primary {

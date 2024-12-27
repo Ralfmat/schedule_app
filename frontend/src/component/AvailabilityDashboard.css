@@ -68,7 +68,6 @@
   border: 1px solid #dadce0;
 }
 
-/* Selected Date (custom style if needed) */
 .fc-daygrid-day.fc-day-selected {
   background-color: #e8f0fe;
   border: 2px solid #4285f4;
@@ -95,7 +94,6 @@
   text-decoration: none; /* Removes underline */
 }
 
-/* Optional: Add some padding or margin if needed */
 .fc-daygrid-day {
   padding: 5px;
 }
