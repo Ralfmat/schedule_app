@@ -4,7 +4,6 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { Button, Typography, Modal, Box, TextField, Card, CardContent } from "@mui/material";
 import {
-  fetchWeekdays,
   fetchWorkdays,
   fetchAvailability,
   fetchCurrentAccount,
@@ -32,8 +31,7 @@ export const AvailabilityDashboard = () => {
 
   useEffect(() => {
     const loadData = async () => {
-      const [weekdays, workdays, availability, account] = await Promise.all([
-        fetchWeekdays(),
+      const [workdays, availability, account] = await Promise.all([
         fetchWorkdays(true),
         fetchAvailability(null, false, true),
         fetchCurrentAccount(),
