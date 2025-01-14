@@ -59,10 +59,6 @@ class Availability(models.Model):
 
     def __str__(self) -> str:
         return f"{self.account.username} - {self.workday.date} ({self.start_time}-{self.end_time})"
-    
-    def clean(self):
-        if self.date < now().date():
-            raise ValidationError("Cannot modify a Availability that is in the past.")
 
 
 class Shift(models.Model):

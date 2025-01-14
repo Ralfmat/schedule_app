@@ -35,7 +35,7 @@ let refresh = false;
 //   }
 // );
 
-export const authInterceptor  = axios.interceptors.request.use(
+export const authInterceptor = axios.interceptors.request.use(
   function (config) {
     const accessToken = localStorage.getItem("access_token");
     if (accessToken) {

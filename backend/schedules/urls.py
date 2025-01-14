@@ -35,9 +35,4 @@ urlpatterns = [
     path('assignments/<int:pk>/', ShiftAssignmentDetailView.as_view(), name='assignment-detail'),
     path('assignments/update/<int:pk>/', ShiftAssignmentUpdateView.as_view(), name='assignment-update'),
     path('assignments/delete/<int:pk>/', ShiftAssignmentDeleteView.as_view(), name='assignment-delete'),
-
-    # path('shift/assign/', ShiftAssignmentView.as_view(), name='shift_assignment'),
-    # path('shift_swap/', ShiftSwapRequestCreateView.as_view(), name='shift_swap_create'),
-    # path('shift_swap/<int:pk>/employee_approve/', ShiftSwapEmployeeApprovalView.as_view(), name='shift_swap_employee_approve'),
-    # path('shift_swap/<int:pk>/manager_approve/', ShiftSwapManagerApprovalView.as_view(), name='shift_swap_manager_approve'),
 ]
