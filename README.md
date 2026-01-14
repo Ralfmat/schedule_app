@@ -38,7 +38,7 @@ I built this project to demonstrate proficiency in **full-stack development**, s
 - **Docker & Docker Compose:** Containerization for consistent development and deployment environments.
 - **Git:** Version control.
 
-## 🚀 Getting Started
+## Getting Started
 
 The easiest way to run the application is using Docker.
 
