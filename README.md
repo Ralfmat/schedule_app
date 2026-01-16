@@ -1,23 +1,23 @@
-# Schedule App
+# Schedule App 📅
 
 > A robust shift management system for employees and managers, built with Django REST Framework and React.
 
 ![Project Screenshot](calendar_view.png)
 
-## About The Project
+## 💡 About The Project
 
 Schedule App is a Single Page Application (SPA) designed to streamline workforce management. It solves the problem of manual scheduling by providing a digital interface for defining availability, assigning shifts, and handling shift swaps.
 
 I built this project to demonstrate proficiency in **full-stack development**, specifically focusing on complex database relationships and a clean separation of concerns between the backend API and the frontend client.
 
-## Key Features
+## ✨ Key Features
 
 - **Role-Based Access Control (RBAC):** Distinct interfaces and permissions for **Managers** and **Employees**.
 - **Interactive Scheduling:** Visual calendar interface for viewing workdays and shifts using FullCalendar.
 - **Availability Management:** Employees can declare their available hours for specific days.
 - **JWT Authentication:** Secure, stateless authentication using JSON Web Tokens.
 
-## Tech Stack
+## 🛠️ Tech Stack
 
 ### Backend
 
